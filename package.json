@@ -1,0 +1,13 @@
+{
+  "name": "VisTEDS",
+  "main": "server.js",
+  "dependencies" : {
+    "express" : "~4.0.0",           
+    "ejs" : "~2.5.6",  
+  	"fs-extra":"~0.26.5",
+    "uuid":"~3.0.1",
+  	"xlsx":"~0.10.5",
+    "node-dbf":"~0.2.1",
+    "sequelize": "3.24.6"
+  }
+}
