@@ -1,3 +1,4 @@
 config.js
 *.txt
 node_modules/
+data/*.csv

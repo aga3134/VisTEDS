@@ -2,6 +2,7 @@ var express = require("express");
 var ejs = require("ejs");
 var route = require("./app/route.js");
 var Config = require('./config');
+var DB = require("./app/db");
 
 var app = express();
 app.set('view engine', 'ejs');
@@ -17,3 +18,4 @@ app.set("view cache", false);
 
 app.listen(app.port, app.host);
 console.log("Server started");
+
