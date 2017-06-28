@@ -1,3 +1,4 @@
+$transition-time: 0.5s;
 
 //==============Responsive================
 $pc-media: 1024px;
@@ -9,6 +10,7 @@ $pc-media: 1024px;
 //===================General======================
 html, body { 
   height: 100%; margin: 0; padding: 0; 
+  overflow: hidden;
 }
 
 * {
@@ -16,8 +18,80 @@ html, body {
     font-family: "微軟正黑體", "Microsoft JhengHei";
 }
 
-#map { 
-  margin: 0px;
-  width: 100%;
-  height: 90%; 
+.center{
+    display: block;
+    margin: auto;
+    clear: both;
+    text-align: center;
+}
+
+//===================map related======================
+#map {
+	margin: 0px;
+	width: 100%;
+	height: calc(100% - 64px); 
+}
+
+.menu-container{
+	position: fixed;
+	left: 0px;
+	bottom: 0px;
+	width: 100%;
+	background-color: #555555;
+
+	.menu-icon{
+		position: relative;
+		top: 10px;
+		width: 40px;
+		height: 40px;
+		margin: 0px 10px;
+	}
+	.menu-bt{
+		display: inline-block;
+		background-color: #dddddd;
+		border-radius: 3px;
+		padding: 5px;
+		margin: 15px 10px;
+		height: 30px;
+		width: 70px;
+		cursor: pointer;
+		&:hover{
+			background-color: #eeeeee;
+		}
+	}
+}
+
+@mixin panel(){
+	position: absolute;
+	display: block;
+	max-width: 100%;
+	max-height: 100%;
+	border-radius: 3px;
+	background-color: rgba(150,150,150,0.85);
+	color: white;
+	box-shadow: 5px 5px 10px rgb(50,50,50);
+	padding: 10px;
+	overflow: auto;
+	select{
+		margin: 5px;
+	}
+	.close-bt{
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		color: white;
+		cursor: pointer;
+		&:hover{
+			color: yellow;
+		}
+	}
+	-webkit-transition: left $transition-time ease;
+    transition: left $transition-time ease;
+}
+#controlPanel{
+	@include panel;
+	bottom: 65px;
+	left: -500px;
+	width: 350px;
+	height: 130px;
 }

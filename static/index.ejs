@@ -1,32 +1,79 @@
 <!doctype html>
 <html lang="zh-Hant-TW">
-    <head>
-	    <title>VisTEDS</title>
-	    <link rel="icon" href="/static/Image/visTEDS.png?v=<%=version%>">
+	<head>
+		<title>VisTEDS</title>
+		<link rel="icon" href="/static/Image/visTEDS.png?v=<%=version%>">
 
-	    <link rel="canonical" href="http://vis-teds.agawork.tw" />
-	    <meta property="og:url" content="http://vis-teds.agawork.tw" />
+		<link rel="canonical" href="http://vis-teds.agawork.tw" />
+		<meta property="og:url" content="http://vis-teds.agawork.tw" />
 
-	    <meta name="description" content="台灣空汙排放源統計 TEDS9.0 視覺化"/>
-	    <meta property="og:description" content="台灣空汙排放源統計 TEDS9.0 視覺化" />
-	    <meta property="og:site_name" content="VisTEDS" />
-	    <meta property="og:locale" content="zh_TW" />
-	    <meta property="og:type" content="website" />
-	    <meta property="og:title" content="VisTEDS" />
-	    <meta property="og:image" content="/static/Image/visTEDS.png?v=<%=version%>" />
+		<meta name="description" content="台灣空汙排放源統計 TEDS9.0 視覺化"/>
+		<meta property="og:description" content="台灣空汙排放源統計 TEDS9.0 視覺化" />
+		<meta property="og:site_name" content="VisTEDS" />
+		<meta property="og:locale" content="zh_TW" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="VisTEDS" />
+		<meta property="og:image" content="/static/Image/visTEDS.png?v=<%=version%>" />
 
-	    <meta http-equiv="Content-Language" content="zh-tw" />
-	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	    <meta name="viewport" content="width=device-width, initial-scale=1">
-	    <link rel="stylesheet" type="text/css" href="/static/build/css/main.css?v=<%=version%>">
+		<meta http-equiv="Content-Language" content="zh-tw" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="/static/build/css/main.css?v=<%=version%>">
 	</head>
-    <body>
-        <script src="https://code.jquery.com/jquery-2.2.2.min.js"   integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="   crossorigin="anonymous"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.min.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=false&key=AIzaSyBUGDJex2sQeScb1Wxcm7oiPGwdmyoLhHM"></script>
+	<body>
+		<script src="https://code.jquery.com/jquery-2.2.2.min.js"   integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="   crossorigin="anonymous"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.min.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=false&key=AIzaSyBUGDJex2sQeScb1Wxcm7oiPGwdmyoLhHM"></script>
 
-        <div id="map"></div>
-        
-        <script src="/static/main.js"></script>
-    </body>
+		<div id="map"></div>
+		
+		<div class="menu-container center">
+			<img class="menu-icon" src="/static/Image/visTEDS.png?v=<%=version%>">
+			<div class="menu-bt" onclick="OpenControlPanel();">設定</div>
+			<div class="menu-bt">統計</div>
+			<div class="menu-bt">關於</div>
+		</div>
+
+		<div id="controlPanel">
+			<div class="close-bt" onclick="CloseControlPanel();">X</div>
+			<div class="map-control">
+				<div>
+					汙染源:
+					<select id="selectSource">
+						<option value="ALL">全部</option>
+						<option value="POINT">點源</option>
+						<option value="LINE">線源</option>
+						<option value="AREA">面源</option>
+						<option value="BIO">生物源</option>
+						<option value="NH3">氨源</option>
+					</select>
+				</div>
+				<div>
+					汙染物:
+					<select id="selectPollute">
+						<option value="TSP">總懸浮微粒</option>
+						<option value="PM10">PM10</option>
+						<option value="PM6">PM6</option>
+						<option value="PM25">PM2.5</option>
+						<option value="SOX">硫氧化物</option>
+						<option value="NOX">氮氧化物</option>
+						<option value="THC">總碳氫有機氣體</option>
+						<option value="NMHC">非甲烷碳氫有機氣體</option>
+						<option value="CO">一氧化碳</option>
+						<option value="PB">鉛</option>
+						<option value="NH3">氨</option>
+					</select>
+				</div>
+
+				<div class="group">
+					著色尺度:<input type="range" id="sensitive" min="1" max="10000" step="1" value="5000">
+					<span id="sensLabel">5000</span> 噸/年
+				</div>
+              
+			</div>
+		</div>
+		
+        <script src="/static/mapGraph.js?v=<%=version%>"></script>
+		<script src="/static/main.js?v=<%=version%>"></script>
+	</body>
 </html>
