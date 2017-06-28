@@ -17,7 +17,7 @@ module.exports = function(sequelize, DataTypes) {
 		SOX_EMI: DataTypes.FLOAT,	//SOx排放量，單位:公噸/年
 		NOX_EMI: DataTypes.FLOAT,	//NOx排放量，單位:公噸/年
 		THC_EMI: DataTypes.FLOAT,	//THC(總碳氫有機氣體)排放量，單位:公噸/年
-		NMHC_EMI: DataTypes.FLOAT,	//NMHC(非甲烷總烴)排放量，單位:公噸/年
+		NMHC_EMI: DataTypes.FLOAT,	//NMHC(非甲烷碳氫有機氣體)排放量，單位:公噸/年
 		CO_EMI: DataTypes.FLOAT,	//CO排放量，單位:公噸/年
 		PB_EMI: DataTypes.FLOAT,	//PB排放量，單位:公噸/年
 		

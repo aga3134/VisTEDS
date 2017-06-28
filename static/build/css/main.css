@@ -1,0 +1,14 @@
+@charset "UTF-8";
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0; }
+
+* {
+  box-sizing: border-box;
+  font-family: "微軟正黑體", "Microsoft JhengHei"; }
+
+#map {
+  margin: 0px;
+  width: 100%;
+  height: 90%; }

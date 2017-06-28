@@ -16,6 +16,11 @@ db.Init = function(){
 	db.AreaSource = db.sequelize.import(__dirname + "./../db/areaSource.js");
 	db.BioSource = db.sequelize.import(__dirname + "./../db/bioSource.js");
 	db.NH3Source = db.sequelize.import(__dirname + "./../db/nh3Source.js");
+	db.PointGrid = db.sequelize.import(__dirname + "./../db/pointGrid.js");
+	db.LineGrid = db.sequelize.import(__dirname + "./../db/lineGrid.js");
+	db.AreaGrid = db.sequelize.import(__dirname + "./../db/areaGrid.js");
+	db.BioGrid = db.sequelize.import(__dirname + "./../db/bioGrid.js");
+	db.NH3Grid = db.sequelize.import(__dirname + "./../db/nh3Grid.js");
 	
 	var syncOp = {};
 	syncOp.force = false;

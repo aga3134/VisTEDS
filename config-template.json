@@ -1,0 +1,8 @@
+{
+	"mysqlAuth": {
+		"dbName": "YourDBName",
+    	"username": "YourUserName",
+    	"password": "YourPassword"
+	},
+	"serverPort": 8001
+}
