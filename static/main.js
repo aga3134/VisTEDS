@@ -18,5 +18,8 @@ window.addEventListener('load', function() {
 		UpdateMapGrid();
 	});
 
-	UpdateMapGrid();
+	$("#selectPollute").change(function(){
+		UpdateMapGrid();
+	});
+
 });
