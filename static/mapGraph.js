@@ -30,6 +30,7 @@ g_FillColor["PB"] = "#000000";
 g_FillColor["NH3"] = "#d8d63c";
 
 g_SenseVal = [250,500,1000,2000,4000,8000];
+var g_InfoWindow = new google.maps.InfoWindow();
 
 function GetLevel(){
 	var zoom = g_Map.getZoom();
@@ -203,6 +204,21 @@ function ExtractData(source, d){
 }
 
 function LoadOrUpdateGrid(source, arr){
+	function clickFn(d){ 
+		return function() {
+			var pos = d.loc;
+			var str = "<p>座標: ("+pos.lat().toFixed(2)+","+pos.lng().toFixed(2)+")</p>";
+			var pollute = $("#selectPollute").val()
+			str += "<p>"+pollute+"排放總數: "+(d[pollute]?d[pollute]+" 噸/年":"無資料")+"</p>";
+			var loc = new google.maps.LatLng(pos.lat(), pos.lng());
+			g_InfoWindow.setOptions({content: str, position: loc});
+			g_InfoWindow.open(g_Map);
+		};
+	}
+	if(g_InfoWindow.getMap()){
+		g_InfoWindow.setOptions({map: null});
+	}
+
 	/*for(var i=0;i<g_LevelNum;i++){
 		var sum = 0;
 		for(var key in g_PointGrid[i]){
@@ -251,6 +267,10 @@ function LoadOrUpdateGrid(source, arr){
 		    	if(d){
 		    		var opacity = d*vScale;
 		    		if(opacity > 1) opacity = 1;
+
+		    		google.maps.event.clearListeners(curGrid.shape,'click');
+		    		curGrid.shape.addListener('click', clickFn(curGrid));
+
 			    	curGrid.shape.setOptions({
 			    		fillColor: fillColor,
 			    		fillOpacity: opacity,
@@ -312,6 +332,8 @@ function LoadOrUpdateGrid(source, arr){
 						zIndex: 1
 			        });
 
+			        shape.listener = shape.addListener('click', clickFn(curGrid));
+
 			    	curGrid.shape = shape;
 				}
 				
@@ -327,6 +349,22 @@ function LoadOrUpdateGrid(source, arr){
 }
 
 function LoadOrUpdateGroup(source, arr, shape){
+	function clickFn(d){ 
+		return function() {
+			var pos = d.loc;
+			var str = "<p>座標: ("+pos.lat().toFixed(4)+","+pos.lng().toFixed(4)+")</p>";
+			var pollute = $("#selectPollute").val()
+			str += "<p>"+pollute+"排放總數: "+(d[pollute]?d[pollute]+" 噸/年":"無資料")+"</p>";
+			str += "<div class='info-bt' onclick='LoadInfoDetail("+pos.lat()+","+pos.lng()+")'>詳細資料</div>";
+			var loc = new google.maps.LatLng(pos.lat(), pos.lng());
+			g_InfoWindow.setOptions({content: str, position: loc});
+			g_InfoWindow.open(g_Map);
+		};
+	}
+	if(g_InfoWindow.getMap()){
+		g_InfoWindow.setOptions({map: null});
+	}
+
 	var bound = g_Map.getBounds();
 	var minLat = bound.getSouthWest().lat();
 	var minLng = bound.getSouthWest().lng();
@@ -363,6 +401,10 @@ function LoadOrUpdateGroup(source, arr, shape){
 		    	if(d){
 		    		var opacity = d*vScale;
 		    		if(opacity > 1) opacity = 1;
+
+		    		google.maps.event.clearListeners(curGrid.shape,'click');
+		    		curGrid.shape.addListener('click', clickFn(curGrid));
+
 			    	curGrid.shape.setOptions({
 			    		fillColor: fillColor,
 			    		fillOpacity: opacity,
@@ -436,6 +478,8 @@ function LoadOrUpdateGroup(source, arr, shape){
 					        });
 			        		break;
 			        }
+			        s.listener = s.addListener('click', clickFn(curGrid));
+
 			        curGrid.shape = s;
 				}
 			});

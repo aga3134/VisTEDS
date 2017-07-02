@@ -7,6 +7,13 @@ function CloseControlPanel(){
 	$("#controlPanel").css("left",-500);	
 }
 
+function LoadInfoDetail(lat, lng){
+	var source = $("#selectSource").val();
+	$.get("/"+source+"-source?lat="+lat.toFixed(5)+"&lng="+lng.toFixed(5), function(data){
+		console.log(data);
+	});
+}
+
 function UpdatePolluteOption(){
 	var source = $("#selectSource").val();
 	var polluteOption = $("#selectPollute");

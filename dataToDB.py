@@ -899,4 +899,21 @@ InsertLineSource('data/linegrid.csv', 0)
 InsertAreaSource('data/areagrid.csv', 0)
 InsertBioSource('data/biogrid.csv', 0)
 InsertNH3Source('data/nh3grid.csv', 0)
+
+#create index
+with connection.cursor() as cursor:
+    sql = "CREATE INDEX PosIndex ON PointSources (WGS84_E,WGS84_N);"
+    sql += "CREATE INDEX PosIndex ON LineSources (WGS84_E,WGS84_N);"
+    sql += "CREATE INDEX PosIndex ON AreaSources (WGS84_E,WGS84_N);"
+    sql += "CREATE INDEX PosIndex ON BioSources (WGS84_E,WGS84_N);"
+    sql += "CREATE INDEX PosIndex ON NH3Sources (WGS84_E,WGS84_N);"
+    
+    sql += "CREATE INDEX PosIndex ON PointGroups (WGS84_E,WGS84_N);"
+    sql += "CREATE INDEX PosIndex ON LineGroups (WGS84_E,WGS84_N);"
+    sql += "CREATE INDEX PosIndex ON AreaGroups (WGS84_E,WGS84_N);"
+    sql += "CREATE INDEX PosIndex ON BioGroups (WGS84_E,WGS84_N);"
+    sql += "CREATE INDEX PosIndex ON NH3Groups (WGS84_E,WGS84_N);"
+    cursor.execute(sql)
+connection.commit()
+
 connection.close()

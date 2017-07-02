@@ -5,8 +5,8 @@ module.exports = function(sequelize, DataTypes) {
 			autoIncrement: true,
 			primaryKey: true
 		},
-		WGS84_E: DataTypes.FLOAT,	//工廠經度座標(東)
-		WGS84_N: DataTypes.FLOAT,	//工廠經度座標(北)
+		WGS84_E: DataTypes.DECIMAL(9,5),	//工廠經度座標(東)
+		WGS84_N: DataTypes.DECIMAL(8,5),	//工廠經度座標(北)
 
 		TSP_EMI: DataTypes.FLOAT,	//TSP(總懸浮微粒)排放量，單位:公噸/年
 		PM_EMI: DataTypes.FLOAT,	//PM10排放量，單位:公噸/年

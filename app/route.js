@@ -11,6 +11,20 @@ module.exports = function(app){
 		res.render("static/index.ejs", {version: version});
 	});
 
+	app.get("/point-source", function(req, res){
+		var lat = req.query.lat;
+		var lng = req.query.lng;
+		if(!lat || !lng) return;
+		
+		console.log(req.query);
+		
+		var query = {'WGS84_N':lat, 'WGS84_E':lng};
+		
+		DB.PointSource.findAll({where: query}).then(function(data) {
+			res.send(data);
+		});
+	});
+
 	app.get("/point-group", function(req, res){
 		var minLat = parseFloat(req.query.minLat);
 		var maxLat = parseFloat(req.query.maxLat);
