@@ -3,9 +3,10 @@ import pymysql
 import math
 import time
 
-levelRange = range(1,7)
+levelRange = range(1,6)
 gridPerUnit = 100
 
+#==========================================================
 def InsertPointSource(filename, skip):
     print("Insert point source started")
     startTime = time.time()
@@ -20,6 +21,7 @@ def InsertPointSource(filename, skip):
     TSP_EFF, SOX_EFF, NOX_EFF, THC_EFF, CO_EFF, PB_EFF,\
     ID_AREA, COMP_NAM, ZS, TSP_RANK, SOX_RANK, NOX_RANK, VOC_RANK, CO_RANK, PB_RANK"
 
+    groupData = {}
     levelData = {}
     for i in levelRange:
         levelData[i] = {}
@@ -58,12 +60,42 @@ def InsertPointSource(filename, skip):
         with connection.cursor() as cursor:
             sql = "INSERT INTO PointSources ("+field+") VALUES ("+val+")"
             #print(sql)
-#            cursor.execute(sql)
+            cursor.execute(sql)
 
         #print("insert data"+arr[0])
-#        connection.commit()
+        connection.commit()
 
-        #先在memory加總，最後再一起存進db
+        #==========group data (依座標分群)=========
+        pos = arr[17]+","+arr[18]
+        if pos in groupData:
+            data = groupData[pos]
+            data["TSP_EMI"] += float(arr[6])
+            data["PM_EMI"] += float(arr[7])
+            data["PM6_EMI"] += float(arr[8])
+            data["PM25_EMI"] += float(arr[9])
+            data["SOX_EMI"] += float(arr[10])
+            data["NOX_EMI"] += float(arr[11])
+            data["THC_EMI"] += float(arr[12])
+            data["NMHC_EMI"] += float(arr[13])
+            data["CO_EMI"] += float(arr[14])
+            data["PB_EMI"] += float(arr[15])
+        else:
+            data = {}
+            data["WGS84_E"] = float(arr[17])
+            data["WGS84_N"] = float(arr[18])
+            data["TSP_EMI"] = float(arr[6])
+            data["PM_EMI"] = float(arr[7])
+            data["PM6_EMI"] = float(arr[8])
+            data["PM25_EMI"] = float(arr[9])
+            data["SOX_EMI"] = float(arr[10])
+            data["NOX_EMI"] = float(arr[11])
+            data["THC_EMI"] = float(arr[12])
+            data["NMHC_EMI"] = float(arr[13])
+            data["CO_EMI"] = float(arr[14])
+            data["PB_EMI"] = float(arr[15])
+            groupData[pos] = data
+
+        #=========先在memory加總，最後再一起存進db=========
         for level in levelRange:
             scale = gridPerUnit/pow(2,level);
             gridX = math.floor(float(arr[17])*scale);
@@ -100,8 +132,42 @@ def InsertPointSource(filename, skip):
                 
     elapseTime = time.time() - startTime
     print("Insert point source finished in "+str(elapseTime)+" s")
+
+    #==========add group to db========
+    print("Insert point group started")
+    startTime = time.time()
+
+    groupField = "WGS84_E, WGS84_N, TSP_EMI, PM_EMI, PM6_EMI, PM25_EMI,\
+    SOX_EMI, NOX_EMI, THC_EMI, NMHC_EMI, CO_EMI, PB_EMI"
+
+    print("群組數: "+str(len(groupData.keys())))
+    for key in groupData:
+        data = groupData[key]
+        groupVal = str(data["WGS84_E"])+","+str(data["WGS84_N"])+","
+
+        with connection.cursor() as cursor:
+            groupVal += str(data["TSP_EMI"])+","
+            groupVal += str(data["PM_EMI"])+","
+            groupVal += str(data["PM6_EMI"])+","
+            groupVal += str(data["PM25_EMI"])+","
+            groupVal += str(data["SOX_EMI"])+","
+            groupVal += str(data["NOX_EMI"])+","
+            groupVal += str(data["THC_EMI"])+","
+            groupVal += str(data["NMHC_EMI"])+","
+            groupVal += str(data["CO_EMI"])+","
+            groupVal += str(data["PB_EMI"])
+            
+            sql = "INSERT INTO PointGroups ("+groupField+") VALUES ("+groupVal+")"
+            #print(sql)
+            cursor.execute(sql)
+
+        connection.commit()
+            
+    elapseTime = time.time() - startTime
+    print("Insert point group finished in "+str(elapseTime)+" s")
     
-    #add grid to db
+    
+    #==========add grid to db===========
     print("Insert point grids started")
     startTime = time.time()
     
@@ -136,6 +202,7 @@ def InsertPointSource(filename, skip):
     print("Insert point grid finished in "+str(elapseTime)+" s")
 
 
+#==========================================================
 def InsertLineSource(filename, skip):
     print("Insert line source started")
     startTime = time.time()
@@ -145,6 +212,7 @@ def InsertLineSource(filename, skip):
     EM_THC, EM_NMHC, EM_EXHC, EM_EHC, EM_RHC, EM_RST,\
     EM_CO, EM_PB, EM_NH3"
 
+    groupData = {}
     levelData = {}
     for i in levelRange:
         levelData[i] = {}
@@ -179,12 +247,52 @@ def InsertLineSource(filename, skip):
         with connection.cursor() as cursor:
             sql = "INSERT INTO LineSources ("+field+") VALUES ("+val+")"
             #print(sql)
-#            cursor.execute(sql)
+            cursor.execute(sql)
 
         #print("insert data"+str(serialNo))
-#        connection.commit()
+        connection.commit()
 
-        #先在memory加總，最後再一起存進db
+        #==========group data (依座標分群)=========
+        pos = arr[2]+","+arr[3]
+        if pos in groupData:
+            data = groupData[pos]
+            data["EM_TSP"] += float(arr[5])
+            data["EM_PM"] += float(arr[6])
+            data["EM_PM6"] += float(arr[7])
+            data["EM_PM25"] += float(arr[8])
+            data["EM_SOX"] += float(arr[9])
+            data["EM_NOX"] += float(arr[10])
+            data["EM_THC"] += float(arr[11])
+            data["EM_NMHC"] += float(arr[12])
+            data["EM_EXHC"] += float(arr[13])
+            data["EM_EHC"] += float(arr[14])
+            data["EM_RHC"] += float(arr[15])
+            data["EM_RST"] += float(arr[16])
+            data["EM_CO"] += float(arr[17])
+            data["EM_PB"] += float(arr[18])
+            data["EM_NH3"] += float(arr[19])
+        else:
+            data = {}
+            data["WGS84_E"] = float(arr[2])
+            data["WGS84_N"] = float(arr[3])
+            data["EM_TSP"] = float(arr[5])
+            data["EM_PM"] = float(arr[6])
+            data["EM_PM6"] = float(arr[7])
+            data["EM_PM25"] = float(arr[8])
+            data["EM_SOX"] = float(arr[9])
+            data["EM_NOX"] = float(arr[10])
+            data["EM_THC"] = float(arr[11])
+            data["EM_NMHC"] = float(arr[12])
+            data["EM_EXHC"] = float(arr[13])
+            data["EM_EHC"] = float(arr[14])
+            data["EM_RHC"] = float(arr[15])
+            data["EM_RST"] = float(arr[16])
+            data["EM_CO"] = float(arr[17])
+            data["EM_PB"] = float(arr[18])
+            data["EM_NH3"] = float(arr[19])
+            groupData[pos] = data
+
+        #===========先在memory加總，最後再一起存進db=========
         for level in levelRange:
             scale = gridPerUnit/pow(2,level);
             gridX = math.floor(float(arr[2])*scale);
@@ -231,8 +339,46 @@ def InsertLineSource(filename, skip):
                 
     elapseTime = time.time() - startTime
     print("Insert line source finished in "+str(elapseTime)+" s")
+
+    #==========add group to db========
+    print("Insert line group started")
+    startTime = time.time()
+
+    groupField = "WGS84_E, WGS84_N, EM_TSP, EM_PM, EM_PM6, EM_PM25, EM_SOX,\
+        EM_NOX, EM_THC, EM_NMHC, EM_EXHC, EM_EHC, EM_RHC, EM_RST, EM_CO, EM_PB, EM_NH3"
+
+    print("群組數: "+str(len(groupData.keys())))
+    for key in groupData:
+        data = groupData[key]
+        groupVal = str(data["WGS84_E"])+","+str(data["WGS84_N"])+","
+
+        with connection.cursor() as cursor:
+            groupVal += str(data["EM_TSP"])+","
+            groupVal += str(data["EM_PM"])+","
+            groupVal += str(data["EM_PM6"])+","
+            groupVal += str(data["EM_PM25"])+","
+            groupVal += str(data["EM_SOX"])+","
+            groupVal += str(data["EM_NOX"])+","
+            groupVal += str(data["EM_THC"])+","
+            groupVal += str(data["EM_NMHC"])+","
+            groupVal += str(data["EM_EXHC"])+","
+            groupVal += str(data["EM_EHC"])+","
+            groupVal += str(data["EM_RHC"])+","
+            groupVal += str(data["EM_RST"])+","
+            groupVal += str(data["EM_CO"])+","
+            groupVal += str(data["EM_PB"])+","
+            groupVal += str(data["EM_NH3"])
+            
+            sql = "INSERT INTO LineGroups ("+groupField+") VALUES ("+groupVal+")"
+            #print(sql)
+            cursor.execute(sql)
+
+        connection.commit()
+            
+    elapseTime = time.time() - startTime
+    print("Insert line group finished in "+str(elapseTime)+" s")
     
-    #add grid to db
+    #==========add grid to db===========
     print("Insert line grids started")
     startTime = time.time()
     
@@ -272,7 +418,7 @@ def InsertLineSource(filename, skip):
     print("Insert line grid finished in "+str(elapseTime)+" s")
 
 
-
+#==========================================================
 def InsertAreaSource(filename, skip):
     print("Insert area source started")
     startTime = time.time()
@@ -281,6 +427,7 @@ def InsertAreaSource(filename, skip):
     EM_TSP, EM_PM, EM_PM6, EM_PM25, EM_SOX, EM_NOX,\
     EM_THC, EM_NMHC,EM_CO, EM_PB, EM_NH3"
 
+    groupData = {}
     levelData = {}
     for i in levelRange:
         levelData[i] = {}
@@ -315,12 +462,44 @@ def InsertAreaSource(filename, skip):
         with connection.cursor() as cursor:
             sql = "INSERT INTO AreaSources ("+field+") VALUES ("+val+")"
             #print(sql)
-#            cursor.execute(sql)
+            cursor.execute(sql)
 
         #print("insert data"+str(serialNo))
-#        connection.commit()
+        connection.commit()
 
-        #先在memory加總，最後再一起存進db
+        #==========group data (依座標分群)=========
+        pos = arr[2]+","+arr[3]
+        if pos in groupData:
+            data = groupData[pos]
+            data["EM_TSP"] += float(arr[5])
+            data["EM_PM"] += float(arr[6])
+            data["EM_PM6"] += float(arr[7])
+            data["EM_PM25"] += float(arr[8])
+            data["EM_SOX"] += float(arr[9])
+            data["EM_NOX"] += float(arr[10])
+            data["EM_THC"] += float(arr[11])
+            data["EM_NMHC"] += float(arr[12])
+            data["EM_CO"] += float(arr[13])
+            data["EM_PB"] += float(arr[14])
+            data["EM_NH3"] += float(arr[15])
+        else:
+            data = {}
+            data["WGS84_E"] = float(arr[2])
+            data["WGS84_N"] = float(arr[3])
+            data["EM_TSP"] = float(arr[5])
+            data["EM_PM"] = float(arr[6])
+            data["EM_PM6"] = float(arr[7])
+            data["EM_PM25"] = float(arr[8])
+            data["EM_SOX"] = float(arr[9])
+            data["EM_NOX"] = float(arr[10])
+            data["EM_THC"] = float(arr[11])
+            data["EM_NMHC"] = float(arr[12])
+            data["EM_CO"] = float(arr[13])
+            data["EM_PB"] = float(arr[14])
+            data["EM_NH3"] = float(arr[15])
+            groupData[pos] = data
+            
+        #=======先在memory加總，最後再一起存進db=======
         for level in levelRange:
             scale = gridPerUnit/pow(2,level);
             gridX = math.floor(float(arr[2])*scale);
@@ -359,8 +538,42 @@ def InsertAreaSource(filename, skip):
                 
     elapseTime = time.time() - startTime
     print("Insert area source finished in "+str(elapseTime)+" s")
+
+    #==========add group to db========
+    print("Insert area group started")
+    startTime = time.time()
+
+    groupField = "WGS84_E, WGS84_N, EM_TSP, EM_PM, EM_PM6, EM_PM25, EM_SOX,\
+        EM_NOX, EM_THC, EM_NMHC, EM_CO, EM_PB, EM_NH3"
+
+    print("群組數: "+str(len(groupData.keys())))
+    for key in groupData:
+        data = groupData[key]
+        groupVal = str(data["WGS84_E"])+","+str(data["WGS84_N"])+","
+
+        with connection.cursor() as cursor:
+            groupVal += str(data["EM_TSP"])+","
+            groupVal += str(data["EM_PM"])+","
+            groupVal += str(data["EM_PM6"])+","
+            groupVal += str(data["EM_PM25"])+","
+            groupVal += str(data["EM_SOX"])+","
+            groupVal += str(data["EM_NOX"])+","
+            groupVal += str(data["EM_THC"])+","
+            groupVal += str(data["EM_NMHC"])+","
+            groupVal += str(data["EM_CO"])+","
+            groupVal += str(data["EM_PB"])+","
+            groupVal += str(data["EM_NH3"])
+            
+            sql = "INSERT INTO AreaGroups ("+groupField+") VALUES ("+groupVal+")"
+            #print(sql)
+            cursor.execute(sql)
+
+        connection.commit()
+            
+    elapseTime = time.time() - startTime
+    print("Insert area group finished in "+str(elapseTime)+" s")
     
-    #add grid to db
+    #===========add grid to db==========
     print("Insert area grids started")
     startTime = time.time()
     
@@ -396,6 +609,7 @@ def InsertAreaSource(filename, skip):
     print("Insert area grid finished in "+str(elapseTime)+" s")
 
 
+#==========================================================
 def InsertBioSource(filename, skip):
     print("Insert bio source started")
     startTime = time.time()
@@ -403,6 +617,7 @@ def InsertBioSource(filename, skip):
     field = "SERIAL_NO,WGS84_E, WGS84_N,\
     TOTAL_NMHC, ISO, MONO, ONMHC, MBO"
 
+    groupData = {}
     levelData = {}
     for i in levelRange:
         levelData[i] = {}
@@ -434,12 +649,32 @@ def InsertBioSource(filename, skip):
         with connection.cursor() as cursor:
             sql = "INSERT INTO BioSources ("+field+") VALUES ("+val+")"
             #print(sql)
-#            cursor.execute(sql)
+            cursor.execute(sql)
 
         #print("insert data"+str(serialNo))
-#        connection.commit()
+        connection.commit()
 
-        #先在memory加總，最後再一起存進db
+        #==========group data (依座標分群)=========
+        pos = arr[0]+","+arr[1]
+        if pos in groupData:
+            data = groupData[pos]
+            data["TOTAL_NMHC"] += float(arr[2])
+            data["ISO"] += float(arr[3])
+            data["MONO"] += float(arr[4])
+            data["ONMHC"] += float(arr[5])
+            data["MBO"] += float(arr[6])
+        else:
+            data = {}
+            data["WGS84_E"] = float(arr[0])
+            data["WGS84_N"] = float(arr[1])
+            data["TOTAL_NMHC"] = float(arr[2])
+            data["ISO"] = float(arr[3])
+            data["MONO"] = float(arr[4])
+            data["ONMHC"] = float(arr[5])
+            data["MBO"] = float(arr[6])
+            groupData[pos] = data
+            
+        #==========先在memory加總，最後再一起存進db==========
         for level in levelRange:
             scale = gridPerUnit/pow(2,level);
             gridX = math.floor(float(arr[0])*scale);
@@ -466,8 +701,35 @@ def InsertBioSource(filename, skip):
                 
     elapseTime = time.time() - startTime
     print("Insert bio source finished in "+str(elapseTime)+" s")
+
+    #==========add group to db========
+    print("Insert bio group started")
+    startTime = time.time()
+
+    groupField = "WGS84_E, WGS84_N, TOTAL_NMHC, ISO, MONO, ONMHC, MBO"
+
+    print("群組數: "+str(len(groupData.keys())))
+    for key in groupData:
+        data = groupData[key]
+        groupVal = str(data["WGS84_E"])+","+str(data["WGS84_N"])+","
+
+        with connection.cursor() as cursor:
+            groupVal += str(data["TOTAL_NMHC"])+","
+            groupVal += str(data["ISO"])+","
+            groupVal += str(data["MONO"])+","
+            groupVal += str(data["ONMHC"])+","
+            groupVal += str(data["MBO"])
+            
+            sql = "INSERT INTO BioGroups ("+groupField+") VALUES ("+groupVal+")"
+            #print(sql)
+            cursor.execute(sql)
+
+        connection.commit()
+            
+    elapseTime = time.time() - startTime
+    print("Insert bio group finished in "+str(elapseTime)+" s")
     
-    #add grid to db
+    #===========add grid to db==========
     print("Insert bio grids started")
     startTime = time.time()
     
@@ -496,12 +758,14 @@ def InsertBioSource(filename, skip):
     print("Insert bio grid finished in "+str(elapseTime)+" s")
 
 
+#==========================================================
 def InsertNH3Source(filename, skip):
     print("Insert NH3 source started")
     startTime = time.time()
     
     field = "SERIAL_NO, NSC, NSC_SUB, WGS84_E, WGS84_N, DICT, EM_NH3"
 
+    groupData = {}
     levelData = {}
     for i in levelRange:
         levelData[i] = {}
@@ -536,12 +800,24 @@ def InsertNH3Source(filename, skip):
         with connection.cursor() as cursor:
             sql = "INSERT INTO NH3Sources ("+field+") VALUES ("+val+")"
             #print(sql)
-#            cursor.execute(sql)
+            cursor.execute(sql)
 
         #print("insert data"+str(serialNo))
-#        connection.commit()
+        connection.commit()
 
-        #先在memory加總，最後再一起存進db
+        #==========group data (依座標分群)=========
+        pos = arr[2]+","+arr[3]
+        if pos in groupData:
+            data = groupData[pos]
+            data["EM_NH3"] += float(arr[5])
+        else:
+            data = {}
+            data["WGS84_E"] = float(arr[2])
+            data["WGS84_N"] = float(arr[3])
+            data["EM_NH3"] = float(arr[5])
+            groupData[pos] = data
+            
+        #===========先在memory加總，最後再一起存進db==========
         for level in levelRange:
             scale = gridPerUnit/pow(2,level);
             gridX = math.floor(float(arr[2])*scale);
@@ -561,8 +837,31 @@ def InsertNH3Source(filename, skip):
                 
     elapseTime = time.time() - startTime
     print("Insert NH3 source finished in "+str(elapseTime)+" s")
+
+    #==========add group to db========
+    print("Insert nh3 group started")
+    startTime = time.time()
+
+    groupField = "WGS84_E, WGS84_N, EM_NH3"
+
+    print("群組數: "+str(len(groupData.keys())))
+    for key in groupData:
+        data = groupData[key]
+        groupVal = str(data["WGS84_E"])+","+str(data["WGS84_N"])+","
+
+        with connection.cursor() as cursor:
+            groupVal += str(data["EM_NH3"])
+            
+            sql = "INSERT INTO NH3Groups ("+groupField+") VALUES ("+groupVal+")"
+            #print(sql)
+            cursor.execute(sql)
+
+        connection.commit()
+            
+    elapseTime = time.time() - startTime
+    print("Insert nh3 group finished in "+str(elapseTime)+" s")
     
-    #add grid to db
+    #==========add grid to db==========
     print("Insert NH3 grids started")
     startTime = time.time()
     
@@ -595,7 +894,7 @@ connection = pymysql.connect(host='localhost',user=auth["username"],
                 password=auth["password"],db=auth["dbName"],
                 charset='utf8',cursorclass=pymysql.cursors.DictCursor)
 
-#InsertPointSource('data/point.csv', 0)
+InsertPointSource('data/point.csv', 0)
 InsertLineSource('data/linegrid.csv', 0)
 InsertAreaSource('data/areagrid.csv', 0)
 InsertBioSource('data/biogrid.csv', 0)

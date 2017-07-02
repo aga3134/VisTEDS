@@ -16,6 +16,13 @@ db.Init = function(){
 	db.AreaSource = db.sequelize.import(__dirname + "./../db/areaSource.js");
 	db.BioSource = db.sequelize.import(__dirname + "./../db/bioSource.js");
 	db.NH3Source = db.sequelize.import(__dirname + "./../db/nh3Source.js");
+
+	db.PointGroup = db.sequelize.import(__dirname + "./../db/pointGroup.js");
+	db.LineGroup = db.sequelize.import(__dirname + "./../db/lineGroup.js");
+	db.AreaGroup = db.sequelize.import(__dirname + "./../db/areaGroup.js");
+	db.BioGroup = db.sequelize.import(__dirname + "./../db/bioGroup.js");
+	db.NH3Group = db.sequelize.import(__dirname + "./../db/nh3Group.js");
+
 	db.PointGrid = db.sequelize.import(__dirname + "./../db/pointGrid.js");
 	db.LineGrid = db.sequelize.import(__dirname + "./../db/lineGrid.js");
 	db.AreaGrid = db.sequelize.import(__dirname + "./../db/areaGrid.js");

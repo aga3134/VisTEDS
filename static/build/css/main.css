@@ -15,6 +15,9 @@ html, body {
   clear: both;
   text-align: center; }
 
+.hide {
+  display: none; }
+
 #map {
   margin: 0px;
   width: 100%;
@@ -71,3 +74,5 @@ html, body {
     cursor: pointer; }
     #controlPanel .close-bt:hover {
       color: yellow; }
+  #controlPanel select option[disabled] {
+    display: none; }

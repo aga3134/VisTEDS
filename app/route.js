@@ -1,6 +1,6 @@
 var DB = require("./db");
 var version = "1.0.0";
-var levelNum = 6;
+var levelNum = 7;
 var gridPerUnit = 100;
 
 module.exports = function(app){
@@ -11,10 +11,25 @@ module.exports = function(app){
 		res.render("static/index.ejs", {version: version});
 	});
 
-	app.get("/point-source", function(req, res){
-		var attr = ['DICT_NO','TSP_EMI','PM_EMI','PM6_EMI','PM25_EMI','SOX_EMI','NOX_EMI','THC_EMI',
+	app.get("/point-group", function(req, res){
+		var minLat = parseFloat(req.query.minLat);
+		var maxLat = parseFloat(req.query.maxLat);
+		var minLng = parseFloat(req.query.minLng);
+		var maxLng = parseFloat(req.query.maxLng);
+
+		var query = {};
+		var condition = [];
+		if(minLat) condition.push({'WGS84_N': {$gte: minLat}});
+		if(maxLat) condition.push({'WGS84_N': {$lte: maxLat}});
+
+		if(minLng) condition.push({'WGS84_E': {$gte: minLng}});
+		if(maxLng) condition.push({'WGS84_E': {$lte: maxLng}});
+		if(condition.length > 0) query.$and = condition;
+
+
+		var attr = ['TSP_EMI','PM_EMI','PM6_EMI','PM25_EMI','SOX_EMI','NOX_EMI','THC_EMI',
 			'NMHC_EMI','CO_EMI','PB_EMI','WGS84_E','WGS84_N'];
-		DB.PointSource.findAll({where: {"SERIAL_NO": {$lte: 1000}}, attributes: attr}).then(function(data) {
+		DB.PointGroup.findAll({where: query, attributes: attr}).then(function(data) {
 			res.send(data);
 		});
 	});
@@ -52,10 +67,24 @@ module.exports = function(app){
 		});
 	});
 
-	app.get("/line-source", function(req, res){
-		var attr = ['NSC','NSC_SUB','WGS84_E','WGS84_N','EM_TSP','EM_PM','EM_PM6','EM_PM25','EM_SOX','EM_NOX',
+	app.get("/line-group", function(req, res){
+		var minLat = parseFloat(req.query.minLat);
+		var maxLat = parseFloat(req.query.maxLat);
+		var minLng = parseFloat(req.query.minLng);
+		var maxLng = parseFloat(req.query.maxLng);
+
+		var query = {};
+		var condition = [];
+		if(minLat) condition.push({'WGS84_N': {$gte: minLat}});
+		if(maxLat) condition.push({'WGS84_N': {$lte: maxLat}});
+
+		if(minLng) condition.push({'WGS84_E': {$gte: minLng}});
+		if(maxLng) condition.push({'WGS84_E': {$lte: maxLng}});
+		if(condition.length > 0) query.$and = condition;
+
+		var attr = ['WGS84_E','WGS84_N','EM_TSP','EM_PM','EM_PM6','EM_PM25','EM_SOX','EM_NOX',
 			'EM_THC','EM_NMHC','EM_EXHC','EM_EHC','EM_RHC','EM_RST','EM_CO','EM_PB','EM_NH3'];
-		DB.LineSource.findAll({where: {"SERIAL_NO": {$lte: 1000}}, attributes: attr}).then(function(data) {
+		DB.LineGroup.findAll({where: query, attributes: attr}).then(function(data) {
 			res.send(data);
 		});
 	});
@@ -93,10 +122,24 @@ module.exports = function(app){
 		});
 	});
 
-	app.get("/area-source", function(req, res){
-		var attr = ['NSC','NSC_SUB','WGS84_E','WGS84_N','EM_TSP','EM_PM','EM_PM6','EM_PM25','EM_SOX','EM_NOX',
+	app.get("/area-group", function(req, res){
+		var minLat = parseFloat(req.query.minLat);
+		var maxLat = parseFloat(req.query.maxLat);
+		var minLng = parseFloat(req.query.minLng);
+		var maxLng = parseFloat(req.query.maxLng);
+
+		var query = {};
+		var condition = [];
+		if(minLat) condition.push({'WGS84_N': {$gte: minLat}});
+		if(maxLat) condition.push({'WGS84_N': {$lte: maxLat}});
+
+		if(minLng) condition.push({'WGS84_E': {$gte: minLng}});
+		if(maxLng) condition.push({'WGS84_E': {$lte: maxLng}});
+		if(condition.length > 0) query.$and = condition;
+
+		var attr = ['WGS84_E','WGS84_N','EM_TSP','EM_PM','EM_PM6','EM_PM25','EM_SOX','EM_NOX',
 			'EM_THC','EM_NMHC','EM_CO','EM_PB','EM_NH3'];
-		DB.AreaSource.findAll({where: {"SERIAL_NO": {$lte: 1000}}, attributes: attr}).then(function(data) {
+		DB.AreaGroup.findAll({where: query, attributes: attr}).then(function(data) {
 			res.send(data);
 		});
 	});
@@ -134,9 +177,23 @@ module.exports = function(app){
 		});
 	});
 
-	app.get("/bio-source", function(req, res){
+	app.get("/bio-group", function(req, res){
+		var minLat = parseFloat(req.query.minLat);
+		var maxLat = parseFloat(req.query.maxLat);
+		var minLng = parseFloat(req.query.minLng);
+		var maxLng = parseFloat(req.query.maxLng);
+
+		var query = {};
+		var condition = [];
+		if(minLat) condition.push({'WGS84_N': {$gte: minLat}});
+		if(maxLat) condition.push({'WGS84_N': {$lte: maxLat}});
+
+		if(minLng) condition.push({'WGS84_E': {$gte: minLng}});
+		if(maxLng) condition.push({'WGS84_E': {$lte: maxLng}});
+		if(condition.length > 0) query.$and = condition;
+
 		var attr = ['WGS84_E','WGS84_N','TOTAL_NMHC','ISO','MONO','ONMHC','MBO'];
-		DB.BioSource.findAll({where: {"SERIAL_NO": {$lte: 1000}}, attributes: attr}).then(function(data) {
+		DB.BioGroup.findAll({where: query, attributes: attr}).then(function(data) {
 			res.send(data);
 		});
 	});
@@ -173,9 +230,23 @@ module.exports = function(app){
 		});
 	});
 
-	app.get("/nh3-source", function(req, res){
-		var attr = ['NSC','NSC_SUB','WGS84_E','WGS84_N','EM_NH3'];
-		DB.NH3Source.findAll({where: {"SERIAL_NO": {$lte: 1000}}, attributes: attr}).then(function(data) {
+	app.get("/nh3-group", function(req, res){
+		var minLat = parseFloat(req.query.minLat);
+		var maxLat = parseFloat(req.query.maxLat);
+		var minLng = parseFloat(req.query.minLng);
+		var maxLng = parseFloat(req.query.maxLng);
+
+		var query = {};
+		var condition = [];
+		if(minLat) condition.push({'WGS84_N': {$gte: minLat}});
+		if(maxLat) condition.push({'WGS84_N': {$lte: maxLat}});
+
+		if(minLng) condition.push({'WGS84_E': {$gte: minLng}});
+		if(maxLng) condition.push({'WGS84_E': {$lte: maxLng}});
+		if(condition.length > 0) query.$and = condition;
+
+		var attr = ['WGS84_E','WGS84_N','EM_NH3'];
+		DB.NH3Group.findAll({where: query, attributes: attr}).then(function(data) {
 			res.send(data);
 		});
 	});

@@ -25,6 +25,10 @@ html, body {
     text-align: center;
 }
 
+.hide{
+	display: none;
+}
+
 //===================map related======================
 #map {
 	margin: 0px;
@@ -94,4 +98,8 @@ html, body {
 	left: -500px;
 	width: 350px;
 	height: 130px;
+	
+	select option[disabled] {
+	    display: none;
+	}
 }
