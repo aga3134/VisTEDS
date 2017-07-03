@@ -11,6 +11,6 @@ module.exports = function(sequelize, DataTypes) {
 		ISO: DataTypes.DECIMAL(10,6),	//異戊二烯(Isoprene)排放量，單位:公噸/年
 		MONO: DataTypes.DECIMAL(10,6),	//單帖類(Monoterpenes)排放量，單位:公噸/年
 		ONMHC: DataTypes.DECIMAL(10,6),	//其他非甲烷碳氫有機氣體排放量，單位:公噸/年
-		MBO: DataTypes.DECIMAL(10,6),	//Methyl-Buten-Ol排放量，單位:公噸/年
+		MBO: DataTypes.DECIMAL(10,6),	//甲基-丁烯-醇(Methyl-Buten-Ol)排放量，單位:公噸/年
 	}, {timestamps: false});
 };

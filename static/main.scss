@@ -41,7 +41,7 @@ html, body {
 	left: 0px;
 	bottom: 0px;
 	width: 100%;
-	background-color: #555555;
+	background-color: #333333;
 
 	.menu-icon{
 		position: relative;
@@ -113,4 +113,66 @@ html, body {
 	select option[disabled] {
 	    display: none;
 	}
+}
+
+.detail-panel{
+	display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 20px);
+    height: 0%;
+    padding: 20px;
+    color: rgb(255,255,255);
+    background-color: rgba(75,75,75,0.9);
+    box-shadow: 5px 5px 10px rgb(50,50,50);
+    z-index: 2;
+
+    .close-bt{
+        z-index: 3;
+        padding: 10px;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+        color: rgb(255,255,255);
+        &:hover{
+            background-color: rgb(200,200,200);
+        }
+    }
+
+    .detail-info{
+    	height: 100%;
+    	margin: 20px 10px;
+	    max-width: calc(100% - 20px);;
+	    overflow: auto;
+    	table{
+    		margin: auto;
+    		td{
+    			padding: 10px;
+    			min-width: 100px;
+    		}
+    		tr:nth-child(even) {
+		        background-color: rgb(125,125,125);
+		    }
+		    tr:nth-child(odd) {
+		        background-color: rgb(150,150,150);
+		    }
+    	}
+    	.center-p{
+    		width: 600px;
+    		max-width: 100%;
+    		margin: auto;
+    		line-height: 1.6em;
+    	}
+    	a{
+    		text-decoration: none;
+    		color: rgb(200,200,200);
+    		&:hover{
+    			color: rgb(255,255,0);
+    		}
+    	}
+    }
 }

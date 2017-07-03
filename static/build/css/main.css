@@ -28,7 +28,7 @@ html, body {
   left: 0px;
   bottom: 0px;
   width: 100%;
-  background-color: #555555; }
+  background-color: #333333; }
   .menu-container .menu-icon {
     position: relative;
     top: 10px;
@@ -85,3 +85,52 @@ html, body {
       color: yellow; }
   #controlPanel select option[disabled] {
     display: none; }
+
+.detail-panel {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 20px);
+  height: 0%;
+  padding: 20px;
+  color: white;
+  background-color: rgba(75, 75, 75, 0.9);
+  box-shadow: 5px 5px 10px #323232;
+  z-index: 2; }
+  .detail-panel .close-bt {
+    z-index: 3;
+    padding: 10px;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    color: white; }
+    .detail-panel .close-bt:hover {
+      background-color: #c8c8c8; }
+  .detail-panel .detail-info {
+    height: 100%;
+    margin: 20px 10px;
+    max-width: calc(100% - 20px);
+    overflow: auto; }
+    .detail-panel .detail-info table {
+      margin: auto; }
+      .detail-panel .detail-info table td {
+        padding: 10px;
+        min-width: 100px; }
+      .detail-panel .detail-info table tr:nth-child(even) {
+        background-color: #7d7d7d; }
+      .detail-panel .detail-info table tr:nth-child(odd) {
+        background-color: #969696; }
+    .detail-panel .detail-info .center-p {
+      width: 600px;
+      max-width: 100%;
+      margin: auto;
+      line-height: 1.6em; }
+    .detail-panel .detail-info a {
+      text-decoration: none;
+      color: #c8c8c8; }
+      .detail-panel .detail-info a:hover {
+        color: yellow; }

@@ -15,9 +15,7 @@ module.exports = function(app){
 		var lat = req.query.lat;
 		var lng = req.query.lng;
 		if(!lat || !lng) return;
-		
-		console.log(req.query);
-		
+	
 		var query = {'WGS84_N':lat, 'WGS84_E':lng};
 		
 		DB.PointSource.findAll({where: query}).then(function(data) {
@@ -81,6 +79,18 @@ module.exports = function(app){
 		});
 	});
 
+	app.get("/line-source", function(req, res){
+		var lat = req.query.lat;
+		var lng = req.query.lng;
+		if(!lat || !lng) return;
+		
+		var query = {'WGS84_N':lat, 'WGS84_E':lng};
+		
+		DB.LineSource.findAll({where: query}).then(function(data) {
+			res.send(data);
+		});
+	});
+
 	app.get("/line-group", function(req, res){
 		var minLat = parseFloat(req.query.minLat);
 		var maxLat = parseFloat(req.query.maxLat);
@@ -135,6 +145,19 @@ module.exports = function(app){
 			res.send(result);
 		});
 	});
+
+	app.get("/area-source", function(req, res){
+		var lat = req.query.lat;
+		var lng = req.query.lng;
+		if(!lat || !lng) return;
+		
+		var query = {'WGS84_N':lat, 'WGS84_E':lng};
+		
+		DB.AreaSource.findAll({where: query}).then(function(data) {
+			res.send(data);
+		});
+	});
+
 
 	app.get("/area-group", function(req, res){
 		var minLat = parseFloat(req.query.minLat);
@@ -191,6 +214,18 @@ module.exports = function(app){
 		});
 	});
 
+	app.get("/bio-source", function(req, res){
+		var lat = req.query.lat;
+		var lng = req.query.lng;
+		if(!lat || !lng) return;
+		
+		var query = {'WGS84_N':lat, 'WGS84_E':lng};
+		
+		DB.BioSource.findAll({where: query}).then(function(data) {
+			res.send(data);
+		});
+	});
+
 	app.get("/bio-group", function(req, res){
 		var minLat = parseFloat(req.query.minLat);
 		var maxLat = parseFloat(req.query.maxLat);
@@ -241,6 +276,18 @@ module.exports = function(app){
 			}
 			result.data = data;
 			res.send(result);
+		});
+	});
+
+	app.get("/nh3-source", function(req, res){
+		var lat = req.query.lat;
+		var lng = req.query.lng;
+		if(!lat || !lng) return;
+		
+		var query = {'WGS84_N':lat, 'WGS84_E':lng};
+		
+		DB.NH3Source.findAll({where: query}).then(function(data) {
+			res.send(data);
 		});
 	});
 

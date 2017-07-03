@@ -209,7 +209,7 @@ function LoadOrUpdateGrid(source, arr){
 			var pos = d.loc;
 			var str = "<p>座標: ("+pos.lat().toFixed(2)+","+pos.lng().toFixed(2)+")</p>";
 			var pollute = $("#selectPollute").val()
-			str += "<p>"+pollute+"排放總數: "+(d[pollute]?d[pollute]+" 噸/年":"無資料")+"</p>";
+			str += "<p>"+pollute+"排放總量: "+(d[pollute]?d[pollute]+" 公噸/年":"無資料")+"</p>";
 			var loc = new google.maps.LatLng(pos.lat(), pos.lng());
 			g_InfoWindow.setOptions({content: str, position: loc});
 			g_InfoWindow.open(g_Map);
@@ -353,9 +353,12 @@ function LoadOrUpdateGroup(source, arr, shape){
 		return function() {
 			var pos = d.loc;
 			var str = "<p>座標: ("+pos.lat().toFixed(4)+","+pos.lng().toFixed(4)+")</p>";
-			var pollute = $("#selectPollute").val()
-			str += "<p>"+pollute+"排放總數: "+(d[pollute]?d[pollute]+" 噸/年":"無資料")+"</p>";
-			str += "<div class='info-bt' onclick='LoadInfoDetail("+pos.lat()+","+pos.lng()+")'>詳細資料</div>";
+			var pollute = $("#selectPollute").val();
+			str += "<p>"+pollute+"排放總量: "+(d[pollute]?d[pollute]+" 公噸/年":"無資料")+"</p>";
+			var source = $("#selectSource").val();
+			if(source != "ALL"){
+				str += "<div class='info-bt' onclick='LoadInfoDetail("+pos.lat()+","+pos.lng()+")'>詳細資料</div>";
+			}
 			var loc = new google.maps.LatLng(pos.lat(), pos.lng());
 			g_InfoWindow.setOptions({content: str, position: loc});
 			g_InfoWindow.open(g_Map);
@@ -456,7 +459,8 @@ function LoadOrUpdateGroup(source, arr, shape){
 					            strokeWeight: 0,
 					            map: showMap,
 					            center: {lat: pLat, lng: pLng},
-					            radius: 200
+					            radius: 200,
+					            zIndex: 2
 					        });
 			        		break;
 			        	case "rect":

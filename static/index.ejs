@@ -30,8 +30,8 @@
 		<div class="menu-container center">
 			<img class="menu-icon" src="/static/Image/visTEDS.png?v=<%=version%>">
 			<div class="menu-bt" onclick="OpenControlPanel();">設定</div>
-			<div class="menu-bt">統計</div>
-			<div class="menu-bt">關於</div>
+			<div class="menu-bt" onclick="OpenStatisticPanel();">統計</div>
+			<div class="menu-bt" onclick="OpenAboutPanel();">關於</div>
 		</div>
 
 		<div id="controlPanel">
@@ -51,14 +51,14 @@
 				<div>
 					汙染物:
 					<select id="selectPollute">
-						<option value="TSP">總懸浮微粒</option>
+						<option value="TSP">總懸浮微粒(TSP)</option>
 						<option value="PM10">PM10</option>
 						<option value="PM6">PM6</option>
 						<option value="PM25" selected>PM2.5</option>
-						<option value="SOX">硫氧化物</option>
-						<option value="NOX">氮氧化物</option>
-						<option value="THC">總碳氫有機氣體</option>
-						<option value="NMHC">非甲烷碳氫有機氣體</option>
+						<option value="SOX">硫氧化物(SOx)</option>
+						<option value="NOX">氮氧化物(NOx)</option>
+						<option value="THC">總碳氫有機氣體(THC)</option>
+						<option value="NMHC">非甲烷碳氫有機氣體(NMHC)</option>
 						
 						<option value="EXHC">碳氫化合物尾氣排放</option>
 						<option value="EHC">碳氫化合物蒸發損失</option>
@@ -70,17 +70,43 @@
 						<option value="ONMHC">其他非甲烷碳氫有機氣體</option>
 						<option value="MBO">甲基-丁烯-醇(Methyl-Buten-Ol)</option>
 
-						<option value="CO">一氧化碳</option>
-						<option value="PB">鉛</option>
-						<option value="NH3">氨</option>
+						<option value="CO">一氧化碳(CO)</option>
+						<option value="PB">鉛(PB)</option>
+						<option value="NH3">氨(NH3)</option>
 					</select>
 				</div>
 
 				<div class="group">
 					著色尺度:<input type="range" id="sensitive" min="1" max="5000" step="1" value="2000">
-					<span id="sensLabel">2000</span> 噸/年
+					<span id="sensLabel">2000</span> 公噸/年
 				</div>
               
+			</div>
+		</div>
+
+		<div id="detailPanel" class="detail-panel">
+			<div class="close-bt" onclick="CloseDetailPanel();">X</div>
+			<div class="detail-info"></div>
+		</div>
+
+		<div id="statisticPanel" class="detail-panel">
+			<div class="close-bt" onclick="CloseStatisticPanel();">X</div>
+		</div>
+
+		<div id="aboutPanel" class="detail-panel">
+			<div class="close-bt" onclick="CloseAboutPanel();">X</div>
+			<div class="detail-info">
+				<h2 class="center">關於 VisTEDS</h2>
+				<div class="center-p">
+					<p>TEDS(Taiwan Emission Data System)為環保署統計的台灣全年空污源排放資料，這個專案針對TEDS9.0 的資料(2013年)做視覺化呈現。</p>
+					<p>相關連結: </p>
+					<ul>
+						<li><a href="https://teds.epa.gov.tw/" target="_blank">環保署TEDS網站</a></li>
+						<li><a href="https://github.com/aga3134/VisTEDS" target="_blank">網站開源程式碼</a></li>
+						<li><a href="http://agawork.tw/" target="_blank">其他專案</a></li>
+						<li>若您對本站有任何建議或合作需求，歡迎來信討論 aga3134@gmail.com</li>
+					</ul>
+				</div>
 			</div>
 		</div>
 		
