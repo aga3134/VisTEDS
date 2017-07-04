@@ -343,4 +343,52 @@ module.exports = function(app){
 			res.send(result);
 		});
 	});
+
+	app.get("/sum-source", function(req, res){
+		var lat = req.query.lat;
+		var lng = req.query.lng;
+		if(!lat || !lng) return;
+		
+		var gridY = Math.floor(lat*gridPerUnit);
+		var gridX = Math.floor(lng*gridPerUnit);
+		
+		var query = {'GRID_X':gridX, 'GRID_Y':gridY};
+		
+		DB.SumSource.findAll({where: query}).then(function(data) {
+			res.send(data);
+		});
+	});
+
+	app.get("/sum-grid", function(req, res){
+		var level = parseInt(req.query.level);
+		var minLat = parseFloat(req.query.minLat);
+		var maxLat = parseFloat(req.query.maxLat);
+		var minLng = parseFloat(req.query.minLng);
+		var maxLng = parseFloat(req.query.maxLng);
+		if(!req.query.level || level < 0 || level >= levelNum) return;
+
+		var scale = gridPerUnit/Math.pow(2,level);
+		var interval = 1.0/scale;
+		var query = {"LEVEL": level};
+		var condition = [];
+		if(minLat) condition.push({'GRID_Y': {$gte: minLat*scale}});
+		if(maxLat) condition.push({'GRID_Y': {$lte: maxLat*scale}});
+
+		if(minLng) condition.push({'GRID_X': {$gte: minLng*scale}});
+		if(maxLng) condition.push({'GRID_X': {$lte: maxLng*scale}});
+		if(condition.length > 0) query.$and = condition;
+
+		var attr = ['GRID_X','GRID_Y','TSP','PM','PM6','PM25','SOX','NOX','THC',
+			'NMHC','CO','PB'];
+		DB.SumGrid.findAll({where: query, attributes: attr}).then(function(data) {
+			var result = {};
+			result.level = level;
+			for(var i=0;i<data.length;i++){
+				data[i].GRID_X = (data[i].GRID_X*interval).toFixed(2);
+				data[i].GRID_Y = (data[i].GRID_Y*interval).toFixed(2);
+			}
+			result.data = data;
+			res.send(result);
+		});
+	});
 }

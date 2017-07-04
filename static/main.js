@@ -228,6 +228,44 @@ function GenNH3Table(data){
 	return str;
 }
 
+function GenSumTable(data){
+	var str = "<table>";
+	str += "<tr>";
+	str += "<td>汙染源</td>";
+	str += "<td>TSP<br>(公噸/年)</td>";
+	str += "<td>PM10<br>(公噸/年)</td>";
+	str += "<td>PM6<br>(公噸/年)</td>";
+	str += "<td>PM2.5<br>(公噸/年)</td>";
+	str += "<td>SOx<br>(公噸/年)</td>";
+	str += "<td>NOx<br>(公噸/年)</td>";
+	str += "<td>THC<br>(公噸/年)</td>";
+	str += "<td>NMHC<br>(公噸/年)</td>";
+	str += "<td>CO<br>(公噸/年)</td>";
+	str += "<td>PB<br>(公噸/年)</td>";
+	str += "</tr>";
+	var type = {};
+	type.POINT = "點源";
+	type.LINE = "線源";
+	type.AREA = "面源";
+	for(var i=0;i<data.length;i++){
+		var d = data[i];
+		str += "<tr>";
+		str += "<td>"+type[d.TYPE]+"</td>";
+		str += "<td>"+d.TSP+"</td>";
+		str += "<td>"+d.PM+"</td>";
+		str += "<td>"+d.PM6+"</td>";
+		str += "<td>"+d.PM25+"</td>";
+		str += "<td>"+d.SOX+"</td>";
+		str += "<td>"+d.NOX+"</td>";
+		str += "<td>"+d.THC+"</td>";
+		str += "<td>"+d.NMHC+"</td>";
+		str += "<td>"+d.CO+"</td>";
+		str += "<td>"+d.PB+"</td>";
+	}
+	str += "</table>";
+	return str;
+}
+
 function OpenDetailPanel(source, data){
 	//console.log(data);
 
@@ -235,7 +273,6 @@ function OpenDetailPanel(source, data){
 	panel.css("display","block");
 	panel.animate({"height":"90%", "opacity":1});
 	var info = panel.children(".detail-info");
-	
 	switch(source){
 		case "POINT":
 			info.html(GenPointTable(data));
@@ -251,6 +288,9 @@ function OpenDetailPanel(source, data){
 			break;
 		case "NH3":
 			info.html(GenNH3Table(data));
+			break;
+		case "SUM":
+			info.html(GenSumTable(data));
 			break;
 	}
 	
@@ -291,7 +331,7 @@ function CloseAboutPanel(){
 
 function LoadInfoDetail(lat, lng){
 	var source = $("#selectSource").val();
-	$.get("/"+source+"-source?lat="+lat.toFixed(5)+"&lng="+lng.toFixed(5), function(data){
+	$.get("/"+source.toLowerCase()+"-source?lat="+lat.toFixed(5)+"&lng="+lng.toFixed(5), function(data){
 		OpenDetailPanel(source, data);
 	});
 }
@@ -427,7 +467,7 @@ function UpdatePolluteOption(){
 				polluteOption.val("NH3");
 			}
 			break;
-		case "ALL":
+		case "SUM":
 			show.TSP = true;
 			show.PM10 = true;
 			show.PM6 = true;

@@ -885,7 +885,260 @@ def InsertNH3Source(filename, skip):
     elapseTime = time.time() - startTime
     print("Insert NH3 grid finished in "+str(elapseTime)+" s")
 
+#==========================sum all source=============================
+class SumData:
+    def __init__(self, gridX, gridY):
+        self.GRID_X = gridX
+        self.GRID_Y = gridY
+        self.TSP = {'POINT':0, 'LINE':0, 'AREA':0}
+        self.PM = {'POINT':0, 'LINE':0, 'AREA':0}
+        self.PM6 = {'POINT':0, 'LINE':0, 'AREA':0}
+        self.PM25 = {'POINT':0, 'LINE':0, 'AREA':0}
+        self.SOX = {'POINT':0, 'LINE':0, 'AREA':0}
+        self.NOX = {'POINT':0, 'LINE':0, 'AREA':0}
+        self.THC = {'POINT':0, 'LINE':0, 'AREA':0}
+        self.NMHC = {'POINT':0, 'LINE':0, 'AREA':0}
+        self.CO = {'POINT':0, 'LINE':0, 'AREA':0}
+        self.PB = {'POINT':0, 'LINE':0, 'AREA':0}
+    def GetTSP(self):
+        return self.TSP["POINT"]+self.TSP["LINE"]+self.TSP["AREA"]
+    def GetPM(self):
+        return self.PM["POINT"]+self.PM["LINE"]+self.PM["AREA"]
+    def GetPM6(self):
+        return self.PM6["POINT"]+self.PM6["LINE"]+self.PM6["AREA"]
+    def GetPM25(self):
+        return self.PM25["POINT"]+self.PM25["LINE"]+self.PM25["AREA"]
+    def GetSOX(self):
+        return self.SOX["POINT"]+self.SOX["LINE"]+self.SOX["AREA"]
+    def GetNOX(self):
+        return self.NOX["POINT"]+self.NOX["LINE"]+self.NOX["AREA"]
+    def GetTHC(self):
+        return self.THC["POINT"]+self.THC["LINE"]+self.THC["AREA"]
+    def GetNMHC(self):
+        return self.NMHC["POINT"]+self.NMHC["LINE"]+self.NMHC["AREA"]
+    def GetCO(self):
+        return self.CO["POINT"]+self.CO["LINE"]+self.CO["AREA"]
+    def GetPB(self):
+        return self.PB["POINT"]+self.PB["LINE"]+self.PB["AREA"]
 
+def SumAllSource(pointFile, lineFile, areaFile):
+    print("Sum all sources started")
+    startTime = time.time()
+
+    levelData = {}
+    levelArr = [0]+list(levelRange)
+    for i in levelArr:
+        levelData[i] = {}
+
+    #============point source===========
+    for line in open(pointFile,errors="ignore"):
+        source = "POINT"
+        #去掉最後面的\n再依,分開成陣列
+        arr = line[0:-1].split(",")
+        
+        #略過第一列
+        if "SERIAL_NO" in arr[0]:
+            continue
+            
+        for level in levelArr:
+            scale = gridPerUnit/pow(2,level);
+            gridX = math.floor(float(arr[17])*scale);
+            gridY = math.floor(float(arr[18])*scale);
+            id = str(level)+"_"+str(gridX)+"_"+str(gridY)
+
+            if id in levelData[level]:
+                data = levelData[level][id]
+                data.TSP[source] += float(arr[6])
+                data.PM[source] += float(arr[7])
+                data.PM6[source] += float(arr[8])
+                data.PM25[source] += float(arr[9])
+                data.SOX[source] += float(arr[10])
+                data.NOX[source] += float(arr[11])
+                data.THC[source] += float(arr[12])
+                data.NMHC[source] += float(arr[13])
+                data.CO[source] += float(arr[14])
+                data.PB[source] += float(arr[15])
+            else:
+                data = SumData(gridX, gridY)
+                data.TSP[source] += float(arr[6])
+                data.PM[source] += float(arr[7])
+                data.PM6[source] += float(arr[8])
+                data.PM25[source] += float(arr[9])
+                data.SOX[source] += float(arr[10])
+                data.NOX[source] += float(arr[11])
+                data.THC[source] += float(arr[12])
+                data.NMHC[source] += float(arr[13])
+                data.CO[source] += float(arr[14])
+                data.PB[source] += float(arr[15])
+                levelData[level][id] = data
+
+    #============line source===========
+    for line in open(lineFile,errors="ignore"):
+        source = "LINE"
+        #去掉最後面的\n再依,分開成陣列
+        arr = line[0:-1].split(",")
+        
+        #略過第一列
+        if "NSC" in arr[0]:
+            continue
+                
+        for level in levelArr:
+            scale = gridPerUnit/pow(2,level);
+            gridX = math.floor(float(arr[2])*scale);
+            gridY = math.floor(float(arr[3])*scale);
+            id = str(level)+"_"+str(gridX)+"_"+str(gridY)
+
+            if id in levelData[level]:
+                data = levelData[level][id]
+                data.TSP[source] += float(arr[5])
+                data.PM[source] += float(arr[6])
+                data.PM6[source] += float(arr[7])
+                data.PM25[source] += float(arr[8])
+                data.SOX[source] += float(arr[9])
+                data.NOX[source] += float(arr[10])
+                data.THC[source] += float(arr[11])
+                data.NMHC[source] += float(arr[12])
+                data.CO[source] += float(arr[17])
+                data.PB[source] += float(arr[18])
+            else:
+                data = SumData(gridX, gridY)
+                data.TSP[source] += float(arr[5])
+                data.PM[source] += float(arr[6])
+                data.PM6[source] += float(arr[7])
+                data.PM25[source] += float(arr[8])
+                data.SOX[source] += float(arr[9])
+                data.NOX[source] += float(arr[10])
+                data.THC[source] += float(arr[11])
+                data.NMHC[source] += float(arr[12])
+                data.CO[source] += float(arr[17])
+                data.PB[source] += float(arr[18])
+                levelData[level][id] = data
+
+    #============area source===========
+    for line in open(areaFile,errors="ignore"):
+        source = "AREA"
+        #去掉最後面的\n再依,分開成陣列
+        arr = line[0:-1].split(",")
+        
+        #略過第一列
+        if "NSC" in arr[0]:
+            continue
+                
+        for level in levelArr:
+            scale = gridPerUnit/pow(2,level);
+            gridX = math.floor(float(arr[2])*scale);
+            gridY = math.floor(float(arr[3])*scale);
+            id = str(level)+"_"+str(gridX)+"_"+str(gridY)
+
+            if id in levelData[level]:
+                data = levelData[level][id]
+                data.TSP[source] += float(arr[5])
+                data.PM[source] += float(arr[6])
+                data.PM6[source] += float(arr[7])
+                data.PM25[source] += float(arr[8])
+                data.SOX[source] += float(arr[9])
+                data.NOX[source] += float(arr[10])
+                data.THC[source] += float(arr[11])
+                data.NMHC[source] += float(arr[12])
+                data.CO[source] += float(arr[13])
+                data.PB[source] += float(arr[14])
+            else:
+                data = SumData(gridX, gridY)
+                data.TSP[source] += float(arr[5])
+                data.PM[source] += float(arr[6])
+                data.PM6[source] += float(arr[7])
+                data.PM25[source] += float(arr[8])
+                data.SOX[source] += float(arr[9])
+                data.NOX[source] += float(arr[10])
+                data.THC[source] += float(arr[11])
+                data.NMHC[source] += float(arr[12])
+                data.CO[source] += float(arr[13])
+                data.PB[source] += float(arr[14])
+                levelData[level][id] = data
+                
+                
+    #===========add grid to db==========
+    field = "TYPE, GRID_X, GRID_Y, TSP, PM, PM6, PM25, SOX, NOX, THC, NMHC, CO, PB"
+    for key in levelData[0]:
+        data = levelData[0][key]
+
+        with connection.cursor() as cursor:
+            source = "POINT"
+            val = "'"+source+"',"+str(data.GRID_X)+","+str(data.GRID_Y)+","
+            val += str(data.TSP[source])+","
+            val += str(data.PM[source])+","
+            val += str(data.PM6[source])+","
+            val += str(data.PM25[source])+","
+            val += str(data.SOX[source])+","
+            val += str(data.NOX[source])+","
+            val += str(data.THC[source])+","
+            val += str(data.NMHC[source])+","
+            val += str(data.CO[source])+","
+            val += str(data.PB[source])
+            sql = "INSERT INTO SumSources ("+field+") VALUES ("+val+");"
+
+            source = "LINE"
+            val = "'"+source+"',"+str(data.GRID_X)+","+str(data.GRID_Y)+","
+            val += str(data.TSP[source])+","
+            val += str(data.PM[source])+","
+            val += str(data.PM6[source])+","
+            val += str(data.PM25[source])+","
+            val += str(data.SOX[source])+","
+            val += str(data.NOX[source])+","
+            val += str(data.THC[source])+","
+            val += str(data.NMHC[source])+","
+            val += str(data.CO[source])+","
+            val += str(data.PB[source])
+            sql += "INSERT INTO SumSources ("+field+") VALUES ("+val+");"
+
+            source = "AREA"
+            val = "'"+source+"',"+str(data.GRID_X)+","+str(data.GRID_Y)+","
+            val += str(data.TSP[source])+","
+            val += str(data.PM[source])+","
+            val += str(data.PM6[source])+","
+            val += str(data.PM25[source])+","
+            val += str(data.SOX[source])+","
+            val += str(data.NOX[source])+","
+            val += str(data.THC[source])+","
+            val += str(data.NMHC[source])+","
+            val += str(data.CO[source])+","
+            val += str(data.PB[source])
+            sql += "INSERT INTO SumSources ("+field+") VALUES ("+val+");"
+
+            cursor.execute(sql)
+
+        connection.commit()
+    
+    levelField = "LEVEL, GRID_X, GRID_Y, TSP, PM, PM6, PM25, SOX, NOX, THC, NMHC, CO, PB"
+    for level in levelArr:
+        print("Level "+str(level)+": 網格數: "+str(len(levelData[level].keys())))
+        for key in levelData[level]:
+            data = levelData[level][key]
+            levelVal = str(level)+","+str(data.GRID_X)+","+str(data.GRID_Y)+","
+
+            with connection.cursor() as cursor:
+                levelVal += str(data.GetTSP())+","
+                levelVal += str(data.GetPM())+","
+                levelVal += str(data.GetPM6())+","
+                levelVal += str(data.GetPM25())+","
+                levelVal += str(data.GetSOX())+","
+                levelVal += str(data.GetNOX())+","
+                levelVal += str(data.GetTHC())+","
+                levelVal += str(data.GetNMHC())+","
+                levelVal += str(data.GetCO())+","
+                levelVal += str(data.GetPB())
+                
+                sql = "INSERT INTO SumGrids ("+levelField+") VALUES ("+levelVal+")"
+                #print(sql)
+                cursor.execute(sql)
+
+            connection.commit()
+            
+        
+    elapseTime = time.time() - startTime
+    print("Sum all sources finished in "+str(elapseTime)+" s")
+
+    
 
 config = json.loads(open("config.json").read())
 
@@ -899,9 +1152,11 @@ InsertLineSource('data/linegrid.csv', 0)
 InsertAreaSource('data/areagrid.csv', 0)
 InsertBioSource('data/biogrid.csv', 0)
 InsertNH3Source('data/nh3grid.csv', 0)
+SumAllSource('data/point.csv', 'data/linegrid.csv', 'data/areagrid.csv')
 
 #create index
 with connection.cursor() as cursor:
+    
     sql = "CREATE INDEX PosIndex ON PointSources (WGS84_E,WGS84_N);"
     sql += "CREATE INDEX PosIndex ON LineSources (WGS84_E,WGS84_N);"
     sql += "CREATE INDEX PosIndex ON AreaSources (WGS84_E,WGS84_N);"
@@ -913,6 +1168,8 @@ with connection.cursor() as cursor:
     sql += "CREATE INDEX PosIndex ON AreaGroups (WGS84_E,WGS84_N);"
     sql += "CREATE INDEX PosIndex ON BioGroups (WGS84_E,WGS84_N);"
     sql += "CREATE INDEX PosIndex ON NH3Groups (WGS84_E,WGS84_N);"
+
+    sql += "CREATE INDEX PosIndex ON SumSources (GRID_X,GRID_Y);"
     cursor.execute(sql)
 connection.commit()
 

@@ -5,6 +5,7 @@ var g_LineGrid = [];
 var g_AreaGrid = [];
 var g_BioGrid = [];
 var g_NH3Grid = [];
+var g_SumGrid = [];
 var g_LevelNum = 6;
 var g_CurLevel = 5;
 var g_FillColor = [];
@@ -62,11 +63,13 @@ function ClearMap(){
 		ToggleDataInMap(g_AreaGrid, i, false);
 		ToggleDataInMap(g_BioGrid, i, false);
 		ToggleDataInMap(g_NH3Grid, i, false);
+		ToggleDataInMap(g_SumGrid, i, false);
 		g_PointGrid[i] = [];
 		g_LineGrid[i] = [];
 		g_AreaGrid[i] = [];
 		g_BioGrid[i] = [];
 		g_NH3Grid[i] = [];
+		g_SumGrid[i] = [];
 	}
 }
 
@@ -79,6 +82,7 @@ function UpdateMapGrid(){
 			ToggleDataInMap(g_AreaGrid, g_CurLevel, false);
 			ToggleDataInMap(g_BioGrid, g_CurLevel, false);
 			ToggleDataInMap(g_NH3Grid, g_CurLevel, false);
+			ToggleDataInMap(g_SumGrid, g_CurLevel, false);
 			break;
 		case "LINE":
 			LoadOrUpdateGrid("line",g_LineGrid);
@@ -86,6 +90,7 @@ function UpdateMapGrid(){
 			ToggleDataInMap(g_AreaGrid, g_CurLevel, false);
 			ToggleDataInMap(g_BioGrid, g_CurLevel, false);
 			ToggleDataInMap(g_NH3Grid, g_CurLevel, false);
+			ToggleDataInMap(g_SumGrid, g_CurLevel, false);
 			break;
 		case "AREA":
 			LoadOrUpdateGrid("area",g_AreaGrid);
@@ -93,6 +98,7 @@ function UpdateMapGrid(){
 			ToggleDataInMap(g_LineGrid, g_CurLevel, false);
 			ToggleDataInMap(g_BioGrid, g_CurLevel, false);
 			ToggleDataInMap(g_NH3Grid, g_CurLevel, false);
+			ToggleDataInMap(g_SumGrid, g_CurLevel, false);
 			break;
 		case "BIO":
 			LoadOrUpdateGrid("bio",g_BioGrid);
@@ -100,6 +106,7 @@ function UpdateMapGrid(){
 			ToggleDataInMap(g_LineGrid, g_CurLevel, false);
 			ToggleDataInMap(g_AreaGrid, g_CurLevel, false);
 			ToggleDataInMap(g_NH3Grid, g_CurLevel, false);
+			ToggleDataInMap(g_SumGrid, g_CurLevel, false);
 			break;
 		case "NH3":
 			LoadOrUpdateGrid("nh3",g_NH3Grid);
@@ -107,13 +114,15 @@ function UpdateMapGrid(){
 			ToggleDataInMap(g_LineGrid, g_CurLevel, false);
 			ToggleDataInMap(g_AreaGrid, g_CurLevel, false);
 			ToggleDataInMap(g_BioGrid, g_CurLevel, false);
+			ToggleDataInMap(g_SumGrid, g_CurLevel, false);
 			break;
-		case "ALL":
-			LoadOrUpdateGrid("point",g_PointGrid);
-			LoadOrUpdateGrid("line",g_LineGrid);
-			LoadOrUpdateGrid("area",g_AreaGrid);
-			LoadOrUpdateGrid("bio",g_BioGrid);
-			LoadOrUpdateGrid("nh3",g_NH3Grid);
+		case "SUM":
+			LoadOrUpdateGrid("sum",g_SumGrid);
+			ToggleDataInMap(g_PointGrid, g_CurLevel, false);
+			ToggleDataInMap(g_LineGrid, g_CurLevel, false);
+			ToggleDataInMap(g_AreaGrid, g_CurLevel, false);
+			ToggleDataInMap(g_BioGrid, g_CurLevel, false);
+			ToggleDataInMap(g_NH3Grid, g_CurLevel, false);
 			break;
 	}
 	
@@ -138,6 +147,7 @@ function UpdateGridZoom(){
 	ToggleDataInMap(g_AreaGrid, g_CurLevel, false);
 	ToggleDataInMap(g_BioGrid, g_CurLevel, false);
 	ToggleDataInMap(g_NH3Grid, g_CurLevel, false);
+	ToggleDataInMap(g_SumGrid, g_CurLevel, false);
 
 	g_CurLevel = level;
 	
@@ -199,6 +209,17 @@ function ExtractData(source, d){
 		case "nh3":
 			obj.NH3 = d.EM_NH3;
 			break;
+		case "sum":
+			obj.TSP = d.TSP;
+			obj.PM10 = d.PM;
+			obj.PM6 = d.PM6;
+			obj.PM25 = d.PM25;
+			obj.SOX = d.SOX;
+			obj.NOX = d.NOX;
+			obj.THC = d.THC;
+			obj.NMHC = d.NMHC;
+			obj.CO = d.CO;
+			obj.PB = d.PB;
 	}
 	return obj;
 }
@@ -210,6 +231,12 @@ function LoadOrUpdateGrid(source, arr){
 			var str = "<p>座標: ("+pos.lat().toFixed(2)+","+pos.lng().toFixed(2)+")</p>";
 			var pollute = $("#selectPollute").val()
 			str += "<p>"+pollute+"排放總量: "+(d[pollute]?d[pollute]+" 公噸/年":"無資料")+"</p>";
+
+			var source = $("#selectSource").val();
+			var level = GetLevel();
+			if(level == 0 && source == "SUM"){
+				str += "<div class='info-bt' onclick='LoadInfoDetail("+pos.lat()+","+pos.lng()+")'>詳細資料</div>";
+			}
 			var loc = new google.maps.LatLng(pos.lat(), pos.lng());
 			g_InfoWindow.setOptions({content: str, position: loc});
 			g_InfoWindow.open(g_Map);
@@ -228,7 +255,7 @@ function LoadOrUpdateGrid(source, arr){
 	}*/
 
 	var level = GetLevel();
-	if(level == 0){
+	if(level == 0 && source != "sum"){
 		var shape = source=="point"?"circle":"rect";
 		return LoadOrUpdateGroup(source, arr, shape);
 	}
@@ -356,9 +383,7 @@ function LoadOrUpdateGroup(source, arr, shape){
 			var pollute = $("#selectPollute").val();
 			str += "<p>"+pollute+"排放總量: "+(d[pollute]?d[pollute]+" 公噸/年":"無資料")+"</p>";
 			var source = $("#selectSource").val();
-			if(source != "ALL"){
-				str += "<div class='info-bt' onclick='LoadInfoDetail("+pos.lat()+","+pos.lng()+")'>詳細資料</div>";
-			}
+			str += "<div class='info-bt' onclick='LoadInfoDetail("+pos.lat()+","+pos.lng()+")'>詳細資料</div>";
 			var loc = new google.maps.LatLng(pos.lat(), pos.lng());
 			g_InfoWindow.setOptions({content: str, position: loc});
 			g_InfoWindow.open(g_Map);
@@ -504,6 +529,7 @@ function InitMap() {
 		g_AreaGrid.push([]);
 		g_BioGrid.push([]);
 		g_NH3Grid.push([]);
+		g_SumGrid.push([]);
 	}
 	var taiwan = new google.maps.LatLng(23.682094,120.7764642);
 

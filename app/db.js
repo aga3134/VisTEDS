@@ -28,6 +28,9 @@ db.Init = function(){
 	db.AreaGrid = db.sequelize.import(__dirname + "./../db/areaGrid.js");
 	db.BioGrid = db.sequelize.import(__dirname + "./../db/bioGrid.js");
 	db.NH3Grid = db.sequelize.import(__dirname + "./../db/nh3Grid.js");
+
+	db.SumGrid = db.sequelize.import(__dirname + "./../db/sumGrid.js");
+	db.SumSource = db.sequelize.import(__dirname + "./../db/sumSource.js");
 	
 	var syncOp = {};
 	syncOp.force = false;
