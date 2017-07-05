@@ -1138,8 +1138,294 @@ def SumAllSource(pointFile, lineFile, areaFile):
     elapseTime = time.time() - startTime
     print("Sum all sources finished in "+str(elapseTime)+" s")
 
+#=============create index============
+def CreateIndex():
+    with connection.cursor() as cursor:
     
+        sql = "CREATE INDEX PosIndex ON PointSources (WGS84_E,WGS84_N);"
+        sql += "CREATE INDEX PosIndex ON LineSources (WGS84_E,WGS84_N);"
+        sql += "CREATE INDEX PosIndex ON AreaSources (WGS84_E,WGS84_N);"
+        sql += "CREATE INDEX PosIndex ON BioSources (WGS84_E,WGS84_N);"
+        sql += "CREATE INDEX PosIndex ON NH3Sources (WGS84_E,WGS84_N);"
+        
+        sql += "CREATE INDEX PosIndex ON PointGroups (WGS84_E,WGS84_N);"
+        sql += "CREATE INDEX PosIndex ON LineGroups (WGS84_E,WGS84_N);"
+        sql += "CREATE INDEX PosIndex ON AreaGroups (WGS84_E,WGS84_N);"
+        sql += "CREATE INDEX PosIndex ON BioGroups (WGS84_E,WGS84_N);"
+        sql += "CREATE INDEX PosIndex ON NH3Groups (WGS84_E,WGS84_N);"
 
+        sql += "CREATE INDEX PosIndex ON SumSources (GRID_X,GRID_Y);"
+        cursor.execute(sql)
+    connection.commit()
+
+#================statistic============
+def DataStatistic(pointFile, lineFile, areaFile):
+    sourceSum = {"POINT": {}, "LINE": {}, "AREA": {}}
+    for t in sourceSum:
+        sourceSum[t]["TSP"] = 0
+        sourceSum[t]["PM"] = 0
+        sourceSum[t]["PM6"] = 0
+        sourceSum[t]["PM25"] = 0
+        sourceSum[t]["SOX"] = 0
+        sourceSum[t]["NOX"] = 0
+        sourceSum[t]["THC"] = 0
+        sourceSum[t]["NMHC"] = 0
+        sourceSum[t]["CO"] = 0
+        sourceSum[t]["PB"] = 0
+        
+    companySum = {}
+    carSum = {}
+    areaSum = {}
+    citySum = {}
+    industrySum = {}
+    #==========point source==========
+    for line in open(pointFile,errors="ignore"):
+        #去掉最後面的\n再依,分開成陣列
+        arr = line[0:-1].split(",")
+        #print(arr)
+        
+        #略過第一列
+        if "SERIAL_NO" in arr[0]:
+            continue
+
+        C_NO = arr[2]
+        DICT = arr[1]
+        COMP_KIND1 = arr[16]
+        
+        if C_NO in companySum:
+            data = companySum[C_NO]
+            data["TSP"] += float(arr[6])
+            data["PM"] += float(arr[7])
+            data["PM6"] += float(arr[8])
+            data["PM25"] += float(arr[9])
+            data["SOX"] += float(arr[10])
+            data["NOX"] += float(arr[11])
+            data["THC"] += float(arr[12])
+            data["NMHC"] += float(arr[13])
+            data["CO"] += float(arr[14])
+            data["PB"] += float(arr[15])
+        else:
+            data = {}
+            data["TSP"] = float(arr[6])
+            data["PM"] = float(arr[7])
+            data["PM6"] = float(arr[8])
+            data["PM25"] = float(arr[9])
+            data["SOX"] = float(arr[10])
+            data["NOX"] = float(arr[11])
+            data["THC"] = float(arr[12])
+            data["NMHC"] = float(arr[13])
+            data["CO"] = float(arr[14])
+            data["PB"] = float(arr[15])
+            companySum[C_NO] = data
+
+        if DICT in citySum:
+            data = citySum[DICT]
+            data["TSP"] += float(arr[6])
+            data["PM"] += float(arr[7])
+            data["PM6"] += float(arr[8])
+            data["PM25"] += float(arr[9])
+            data["SOX"] += float(arr[10])
+            data["NOX"] += float(arr[11])
+            data["THC"] += float(arr[12])
+            data["NMHC"] += float(arr[13])
+            data["CO"] += float(arr[14])
+            data["PB"] += float(arr[15])
+        else:
+            data = {}
+            data["TSP"] = float(arr[6])
+            data["PM"] = float(arr[7])
+            data["PM6"] = float(arr[8])
+            data["PM25"] = float(arr[9])
+            data["SOX"] = float(arr[10])
+            data["NOX"] = float(arr[11])
+            data["THC"] = float(arr[12])
+            data["NMHC"] = float(arr[13])
+            data["CO"] = float(arr[14])
+            data["PB"] = float(arr[15])
+            citySum[DICT] = data
+
+        if COMP_KIND1 in industrySum:
+            data = industrySum[COMP_KIND1]
+            data["TSP"] += float(arr[6])
+            data["PM"] += float(arr[7])
+            data["PM6"] += float(arr[8])
+            data["PM25"] += float(arr[9])
+            data["SOX"] += float(arr[10])
+            data["NOX"] += float(arr[11])
+            data["THC"] += float(arr[12])
+            data["NMHC"] += float(arr[13])
+            data["CO"] += float(arr[14])
+            data["PB"] += float(arr[15])
+        else:
+            data = {}
+            data["TSP"] = float(arr[6])
+            data["PM"] = float(arr[7])
+            data["PM6"] = float(arr[8])
+            data["PM25"] = float(arr[9])
+            data["SOX"] = float(arr[10])
+            data["NOX"] = float(arr[11])
+            data["THC"] = float(arr[12])
+            data["NMHC"] = float(arr[13])
+            data["CO"] = float(arr[14])
+            data["PB"] = float(arr[15])
+            industrySum[COMP_KIND1] = data
+
+    #==========line source==========
+    for line in open(lineFile,errors="ignore"):
+        #去掉最後面的\n再依,分開成陣列
+        arr = line[0:-1].split(",")
+        #print(arr)
+        
+        #略過第一列
+        if "NSC" in arr[0]:
+            continue
+
+        NSC = arr[0]
+        DICT = arr[4]
+                
+        if NSC in carSum:
+            data = carSum[NSC]
+            data["TSP"] += float(arr[5])
+            data["PM"] += float(arr[6])
+            data["PM6"] += float(arr[7])
+            data["PM25"] += float(arr[8])
+            data["SOX"] += float(arr[9])
+            data["NOX"] += float(arr[10])
+            data["THC"] += float(arr[11])
+            data["NMHC"] += float(arr[12])
+            data["CO"] += float(arr[17])
+            data["PB"] += float(arr[18])
+        else:
+            data = {}
+            data["TSP"] = float(arr[5])
+            data["PM"] = float(arr[6])
+            data["PM6"] = float(arr[7])
+            data["PM25"] = float(arr[8])
+            data["SOX"] = float(arr[9])
+            data["NOX"] = float(arr[10])
+            data["THC"] = float(arr[11])
+            data["NMHC"] = float(arr[12])
+            data["CO"] = float(arr[17])
+            data["PB"] = float(arr[18])
+            carSum[NSC] = data
+
+        if DICT in citySum:
+            data = citySum[DICT]
+            data["TSP"] += float(arr[5])
+            data["PM"] += float(arr[6])
+            data["PM6"] += float(arr[7])
+            data["PM25"] += float(arr[8])
+            data["SOX"] += float(arr[9])
+            data["NOX"] += float(arr[10])
+            data["THC"] += float(arr[11])
+            data["NMHC"] += float(arr[12])
+            data["CO"] += float(arr[17])
+            data["PB"] += float(arr[18])
+        else:
+            data = {}
+            data["TSP"] = float(arr[5])
+            data["PM"] = float(arr[6])
+            data["PM6"] = float(arr[7])
+            data["PM25"] = float(arr[8])
+            data["SOX"] = float(arr[9])
+            data["NOX"] = float(arr[10])
+            data["THC"] = float(arr[11])
+            data["NMHC"] = float(arr[12])
+            data["CO"] = float(arr[17])
+            data["PB"] = float(arr[18])
+            citySum[DICT] = data
+
+    #==========area source==========
+    for line in open(areaFile,errors="ignore"):
+        #去掉最後面的\n再依,分開成陣列
+        arr = line[0:-1].split(",")
+        #print(arr)
+        
+        #略過第一列
+        if "NSC" in arr[0]:
+            continue
+
+        NSC = arr[0]
+        DICT = arr[4]
+                
+        if NSC in areaSum:
+            data = areaSum[NSC]
+            data["TSP"] += float(arr[5])
+            data["PM"] += float(arr[6])
+            data["PM6"] += float(arr[7])
+            data["PM25"] += float(arr[8])
+            data["SOX"] += float(arr[9])
+            data["NOX"] += float(arr[10])
+            data["THC"] += float(arr[11])
+            data["NMHC"] += float(arr[12])
+            data["CO"] += float(arr[13])
+            data["PB"] += float(arr[14])
+        else:
+            data = {}
+            data["TSP"] = float(arr[5])
+            data["PM"] = float(arr[6])
+            data["PM6"] = float(arr[7])
+            data["PM25"] = float(arr[8])
+            data["SOX"] = float(arr[9])
+            data["NOX"] = float(arr[10])
+            data["THC"] = float(arr[11])
+            data["NMHC"] = float(arr[12])
+            data["CO"] = float(arr[13])
+            data["PB"] = float(arr[14])
+            areaSum[NSC] = data
+
+        if DICT in citySum:
+            data = citySum[DICT]
+            data["TSP"] += float(arr[5])
+            data["PM"] += float(arr[6])
+            data["PM6"] += float(arr[7])
+            data["PM25"] += float(arr[8])
+            data["SOX"] += float(arr[9])
+            data["NOX"] += float(arr[10])
+            data["THC"] += float(arr[11])
+            data["NMHC"] += float(arr[12])
+            data["CO"] += float(arr[13])
+            data["PB"] += float(arr[14])
+        else:
+            data = {}
+            data["TSP"] = float(arr[5])
+            data["PM"] = float(arr[6])
+            data["PM6"] = float(arr[7])
+            data["PM25"] = float(arr[8])
+            data["SOX"] = float(arr[9])
+            data["NOX"] = float(arr[10])
+            data["THC"] = float(arr[11])
+            data["NMHC"] = float(arr[12])
+            data["CO"] = float(arr[13])
+            data["PB"] = float(arr[14])
+            citySum[DICT] = data
+
+    #==========source sum============
+    for key in companySum:
+        for pollute in companySum[key]:
+            sourceSum["POINT"][pollute] += companySum[key][pollute]
+
+    for key in carSum:
+        for pollute in carSum[key]:
+            sourceSum["LINE"][pollute] += carSum[key][pollute]
+
+    for key in areaSum:
+        for pollute in areaSum[key]:
+            sourceSum["AREA"][pollute] += areaSum[key][pollute]
+
+    print("CompanyNum: "+str(len(companySum.keys())))
+    print("Car keys: ")
+    print(carSum.keys())
+    print("Area keys: ")
+    print(areaSum.keys())
+    print("City keys: ")
+    print(citySum.keys())
+    print("Industry keys: ")
+    print(industrySum.keys())
+    print(sourceSum);
+
+
+#=================main=================
 config = json.loads(open("config.json").read())
 
 auth = config["mysqlAuth"]
@@ -1147,30 +1433,14 @@ connection = pymysql.connect(host='localhost',user=auth["username"],
                 password=auth["password"],db=auth["dbName"],
                 charset='utf8',cursorclass=pymysql.cursors.DictCursor)
 
-InsertPointSource('data/point.csv', 0)
-InsertLineSource('data/linegrid.csv', 0)
-InsertAreaSource('data/areagrid.csv', 0)
-InsertBioSource('data/biogrid.csv', 0)
-InsertNH3Source('data/nh3grid.csv', 0)
-SumAllSource('data/point.csv', 'data/linegrid.csv', 'data/areagrid.csv')
+#InsertPointSource('data/point.csv', 0)
+#InsertLineSource('data/linegrid.csv', 0)
+#InsertAreaSource('data/areagrid.csv', 0)
+#InsertBioSource('data/biogrid.csv', 0)
+#InsertNH3Source('data/nh3grid.csv', 0)
+#SumAllSource('data/point.csv', 'data/linegrid.csv', 'data/areagrid.csv')
 
-#create index
-with connection.cursor() as cursor:
-    
-    sql = "CREATE INDEX PosIndex ON PointSources (WGS84_E,WGS84_N);"
-    sql += "CREATE INDEX PosIndex ON LineSources (WGS84_E,WGS84_N);"
-    sql += "CREATE INDEX PosIndex ON AreaSources (WGS84_E,WGS84_N);"
-    sql += "CREATE INDEX PosIndex ON BioSources (WGS84_E,WGS84_N);"
-    sql += "CREATE INDEX PosIndex ON NH3Sources (WGS84_E,WGS84_N);"
-    
-    sql += "CREATE INDEX PosIndex ON PointGroups (WGS84_E,WGS84_N);"
-    sql += "CREATE INDEX PosIndex ON LineGroups (WGS84_E,WGS84_N);"
-    sql += "CREATE INDEX PosIndex ON AreaGroups (WGS84_E,WGS84_N);"
-    sql += "CREATE INDEX PosIndex ON BioGroups (WGS84_E,WGS84_N);"
-    sql += "CREATE INDEX PosIndex ON NH3Groups (WGS84_E,WGS84_N);"
-
-    sql += "CREATE INDEX PosIndex ON SumSources (GRID_X,GRID_Y);"
-    cursor.execute(sql)
-connection.commit()
+#CreateIndex()
+DataStatistic('data/point.csv', 'data/linegrid.csv', 'data/areagrid.csv')
 
 connection.close()

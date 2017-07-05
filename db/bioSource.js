@@ -2,6 +2,7 @@ module.exports = function(sequelize, DataTypes) {
 	return sequelize.define("bioSource", {
 	  	SERIAL_NO: {	//序號
 			type: DataTypes.INTEGER,
+			autoIncrement: true,
 			primaryKey: true
 		},
 		WGS84_E: DataTypes.DECIMAL(9,5),	//工廠經度座標(東)

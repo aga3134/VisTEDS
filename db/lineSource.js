@@ -2,6 +2,7 @@ module.exports = function(sequelize, DataTypes) {
 	return sequelize.define("lineSource", {
 	  	SERIAL_NO: {	//序號
 			type: DataTypes.INTEGER,
+			autoIncrement: true,
 			primaryKey: true
 		},
 		NSC: DataTypes.STRING(6),	//汙染源代碼，車種別

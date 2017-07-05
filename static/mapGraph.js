@@ -481,10 +481,11 @@ function LoadOrUpdateGroup(source, arr, shape){
 			        		s = new google.maps.Circle({
 					            fillColor: fillColor,
 					            fillOpacity: opacity,
-					            strokeWeight: 0,
+					            strokeWeight: 1,
+					            strokeColor: "#999999",
 					            map: showMap,
 					            center: {lat: pLat, lng: pLng},
-					            radius: 200,
+					            radius: 50,
 					            zIndex: 2
 					        });
 			        		break;

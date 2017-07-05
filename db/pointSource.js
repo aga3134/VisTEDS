@@ -2,6 +2,7 @@ module.exports = function(sequelize, DataTypes) {
 	return sequelize.define("pointSource", {
 	  	SERIAL_NO: {	//序號
 			type: DataTypes.INTEGER,
+			autoIncrement: true,
 			primaryKey: true
 		},
 		DICT_NO: DataTypes.STRING(4),	//鄉鎮代碼
