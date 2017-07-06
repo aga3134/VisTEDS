@@ -89,8 +89,136 @@
 			<div class="detail-info"></div>
 		</div>
 
-		<div id="statisticPanel" class="detail-panel">
+		<div id="statisticPanel" class="stat-panel">
 			<div class="close-bt" onclick="CloseStatisticPanel();">X</div>
+			<div>
+				<div class="half-width">
+					<h2 class="center">汙染源比例</h2>
+					<div class="graph-container">
+						<svg class="stat-graph" id="graphTotal"></svg>
+						<div class="select-container">
+							汙染物 <select id="selPolluteTotal">
+								<option value="TSP">TSP</option>
+								<option value="PM">PM10</option>
+								<option value="PM6">PM6</option>
+								<option value="PM25" selected>PM2.5</option>
+								<option value="SOX">SOx</option>
+								<option value="NOX">NOx</option>
+								<option value="THC">THC</option>
+								<option value="NMHC">NMHC</option>
+								<option value="CO">CO</option>
+								<option value="PB">PB</option>
+							</select>
+						</div>
+					</div>
+					<div class="center" id="infoTotal">&nbsp;</div>
+				</div>
+				<div class="half-width">
+					<h2 class="center">縣市排放排名</h2>
+					<div class="graph-container">
+						<svg class="stat-graph" id="graphCity"></svg>
+						<div class="select-container">
+							汙染物 <select id="selPolluteCity">
+								<option value="TSP">TSP</option>
+								<option value="PM">PM10</option>
+								<option value="PM6">PM6</option>
+								<option value="PM25" selected>PM2.5</option>
+								<option value="SOX">SOx</option>
+								<option value="NOX">NOx</option>
+								<option value="THC">THC</option>
+								<option value="NMHC">NMHC</option>
+								<option value="CO">CO</option>
+								<option value="PB">PB</option>
+							</select>
+						</div>
+					</div>
+					<div class="center" id="infoCity">&nbsp;</div>
+				</div>
+				<div class="half-width">
+					<h2 class="center">行業排放排名前20(僅統計點源)</h2>
+					<div class="graph-container">
+						<svg class="stat-graph" id="graphIndustry"></svg>
+						<div class="select-container">
+							汙染物 <select id="selPolluteIndustry">
+								<option value="TSP">TSP</option>
+								<option value="PM">PM10</option>
+								<option value="PM6">PM6</option>
+								<option value="PM25" selected>PM2.5</option>
+								<option value="SOX">SOx</option>
+								<option value="NOX">NOx</option>
+								<option value="THC">THC</option>
+								<option value="NMHC">NMHC</option>
+								<option value="CO">CO</option>
+								<option value="PB">PB</option>
+							</select>
+						</div>
+					</div>
+					<div class="center" id="infoIndustry">&nbsp;</div>
+				</div>
+				<div class="half-width">
+					<h2 class="center">公司排放排名前20</h2>
+					<div class="graph-container">
+						<svg class="stat-graph" id="graphCompany"></svg>
+						<div class="select-container">
+							汙染物 <select id="selPolluteCompany">
+								<option value="TSP">TSP</option>
+								<option value="PM">PM10</option>
+								<option value="PM6">PM6</option>
+								<option value="PM25" selected>PM2.5</option>
+								<option value="SOX">SOx</option>
+								<option value="NOX">NOx</option>
+								<option value="THC">THC</option>
+								<option value="NMHC">NMHC</option>
+								<option value="CO">CO</option>
+								<option value="PB">PB</option>
+							</select>
+						</div>
+					</div>
+					<div class="center" id="infoCompany">&nbsp;</div>
+				</div>
+				<div class="half-width">
+					<h2 class="center">車輛排放比例</h2>
+					<div class="graph-container">
+						<svg class="stat-graph" id="graphTraffic"></svg>
+						<div class="select-container">
+							汙染物 <select id="selPolluteTraffic">
+								<option value="TSP">TSP</option>
+								<option value="PM">PM10</option>
+								<option value="PM6">PM6</option>
+								<option value="PM25" selected>PM2.5</option>
+								<option value="SOX">SOx</option>
+								<option value="NOX">NOx</option>
+								<option value="THC">THC</option>
+								<option value="NMHC">NMHC</option>
+								<option value="CO">CO</option>
+								<option value="PB">PB</option>
+							</select>
+						</div>
+					</div>
+					<div class="center" id="infoTraffic">&nbsp;</div>
+				</div>
+				<div class="half-width">
+					<h2 class="center">面源排放排名前20</h2>
+					<div class="graph-container">
+						<svg class="stat-graph" id="graphArea"></svg>
+						<div class="select-container">
+							汙染物 <select id="selPolluteArea">
+								<option value="TSP">TSP</option>
+								<option value="PM">PM10</option>
+								<option value="PM6">PM6</option>
+								<option value="PM25" selected>PM2.5</option>
+								<option value="SOX">SOx</option>
+								<option value="NOX">NOx</option>
+								<option value="THC">THC</option>
+								<option value="NMHC">NMHC</option>
+								<option value="CO">CO</option>
+								<option value="PB">PB</option>
+							</select>
+						</div>
+					</div>
+					<div class="center" id="infoArea">&nbsp;</div>
+				</div>
+			</div>
 		</div>
 
 		<div id="aboutPanel" class="detail-panel">
@@ -111,6 +239,7 @@
 		</div>
 		
         <script src="/static/mapGraph.js?v=<%=version%>"></script>
+        <script src="/static/statisticGraph.js?v=<%=version%>"></script>
 		<script src="/static/main.js?v=<%=version%>"></script>
 	</body>
 </html>

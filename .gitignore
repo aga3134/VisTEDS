@@ -1,4 +1,4 @@
 config.json
 *.txt
 node_modules/
-data/
+data/*.dbf

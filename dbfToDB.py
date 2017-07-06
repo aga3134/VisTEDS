@@ -772,6 +772,9 @@ def SumAllSource(pointFile, lineFile, areaFile):
 
 #=============create index============
 def CreateIndex():
+    print("Create index started")
+    startTime = time.time()
+    
     with connection.cursor() as cursor:
     
         sql = "CREATE INDEX PosIndex ON PointSources (WGS84_E,WGS84_N);"
@@ -790,8 +793,14 @@ def CreateIndex():
         cursor.execute(sql)
     connection.commit()
 
+    elapseTime = time.time() - startTime
+    print("Create index finished in "+str(elapseTime)+" s")
+
 #================statistic============
 def DataStatistic(pointFile, lineFile, areaFile):
+    print("data statistic started")
+    startTime = time.time()
+    
     sourceSum = {"POINT": {}, "LINE": {}, "AREA": {}}
     for s in sourceSum:
         sourceSum[s]["TSP"] = 0
@@ -805,11 +814,11 @@ def DataStatistic(pointFile, lineFile, areaFile):
         sourceSum[s]["CO"] = 0
         sourceSum[s]["PB"] = 0
         
-    companySum = {}
-    carSum = {}
-    areaSum = {}
-    citySum = {}
-    industrySum = {}
+    companySum = {}     #點源
+    carSum = {}         #線源
+    areaSum = {}        #面源
+    citySum = {}        #點源+線源+面源
+    industrySum = {}    #點源
     #==========point source==========
     keyMap = {}
     keyMap["TSP_EMI"] = "TSP"
@@ -832,7 +841,7 @@ def DataStatistic(pointFile, lineFile, areaFile):
             data = companySum[C_NO]
             AccumulateData(record, data, keyMap)
         else:
-            data = {}
+            data = {"NAME": record["COMP_NAM"]}
             AccumulateData(record, data, keyMap)
             companySum[C_NO] = data
 
@@ -851,7 +860,7 @@ def DataStatistic(pointFile, lineFile, areaFile):
             data = {}
             AccumulateData(record, data, keyMap)
             industrySum[COMP_KIND1] = data
-
+    
     #==========line source==========
     keyMap = {}
     keyMap["EM_TSP"] = "TSP"
@@ -921,6 +930,8 @@ def DataStatistic(pointFile, lineFile, areaFile):
     #==========source sum============
     for key in companySum:
         for pollute in companySum[key]:
+            if pollute == "NAME":
+                continue
             sourceSum["POINT"][pollute] += companySum[key][pollute]
 
     for key in carSum:
@@ -930,18 +941,48 @@ def DataStatistic(pointFile, lineFile, areaFile):
     for key in areaSum:
         for pollute in areaSum[key]:
             sourceSum["AREA"][pollute] += areaSum[key][pollute]
-
-    print("CompanyNum: "+str(len(companySum.keys())))
-    print("Car keys: ")
-    print(carSum.keys())
-    print("Area keys: ")
-    print(areaSum.keys())
-    print("City keys: ")
-    print(citySum.keys())
-    print("Industry keys: ")
-    print(industrySum.keys())
-    print(sourceSum);
     
+    #===========output json===========
+    result = {}
+    limitNum = 20
+    def GenSortedData(data, pollute, limit):
+        result = []
+        sortedKey = sorted(data, key = lambda x: data[x][pollute], reverse=True)
+        count = 0
+        for key in sortedKey:
+            count+=1
+            if(count > limit):
+                break
+            d = data[key]
+            out = {"ID": key, "SUM": d[pollute]}
+            if "NAME" in d:
+                out["NAME"] = d["NAME"]
+            result.append(out)
+        return result
+
+    companyResult = {}
+    keyArr = ["TSP","PM","PM6","PM25","SOX","NOX","THC","NMHC","CO","PB"]
+    for key in keyArr:
+        companyResult[key] = GenSortedData(companySum, key, limitNum)
+
+    result["COMPANY"] = companyResult
+    result["TRAFFIC"] = carSum
+    result["AREA"] = areaSum
+    result["CITY"] = citySum
+
+    industryResult = {}
+    for key in keyArr:
+        industryResult[key] = GenSortedData(industrySum, key, limitNum)
+
+    result["INDUSTRY"] = industryResult
+    result["TOTAL"] = sourceSum
+
+    with open('data/statistic.json', 'w') as outfile:
+        json.dump(result, outfile)
+
+    elapseTime = time.time() - startTime
+    print("Data statistic finished in "+str(elapseTime)+" s")
+      
 
 #=================main=================
 config = json.loads(open("config.json").read())

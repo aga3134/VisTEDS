@@ -1,6 +1,9 @@
 var g_AreaType = {};
 var g_NH3Type = {};
-
+var g_CarType = {};
+var g_CityName = {};
+var g_IndustryName = {};
+var g_StatData;
 
 function OpenControlPanel(){
 	var panel = $("#controlPanel");
@@ -17,72 +20,78 @@ function CloseControlPanel(){
 	$("#controlPanel").css("left",-500);	
 }
 
-function LoadAreaType(){
-	$.get("/data/area_type.csv", function(d){
-		g_AreaType = {};
+function LoadIDMap(){
+	function ParseData(d){
+		result = {};
 		var arr = d.split("\n");
 		for(var i=0;i<arr.length;i++){
 			var line = arr[i];
 			var row = line.split(",");
-			g_AreaType[row[0]] = row[1];
+			result[row[0]] = row[1];
 		}
+		return result;
+	}
+	$.get("/data/area_type.csv", function(d){
+		g_AreaType = ParseData(d);
 	});
 	$.get("/data/nh3_type.csv", function(d){
-		g_NH3Type = {};
-		var arr = d.split("\n");
-		for(var i=0;i<arr.length;i++){
-			var line = arr[i];
-			var row = line.split(",");
-			g_NH3Type[row[0]] = row[1];
-		}
+		g_NH3Type = ParseData(d);
 	});
-	
+	$.get("/data/car_type.csv", function(d){
+		g_CarType = ParseData(d);
+	});
+	$.get("/data/city_name.csv", function(d){
+		g_CityName = ParseData(d);
+	});
+	$.get("/data/industry_name.csv", function(d){
+		g_IndustryName = ParseData(d);
+	});
 }
 
 function GenPointTable(data){
 	var str = "<table>";
 	str += "<tr>";
-	str +="<td>公司名稱</td>";
-	str += "<td>汙染源編號</td>";
-	str += "<td>TSP<br>(公噸/年)</td>";
-	str += "<td>PM10<br>(公噸/年)</td>";
-	str += "<td>PM6<br>(公噸/年)</td>";
-	str += "<td>PM2.5<br>(公噸/年)</td>";
-	str += "<td>SOx<br>(公噸/年)</td>";
-	str += "<td>NOx<br>(公噸/年)</td>";
-	str += "<td>THC<br>(公噸/年)</td>";
-	str += "<td>NMHC<br>(公噸/年)</td>";
-	str += "<td>CO<br>(公噸/年)</td>";
-	str += "<td>PB<br>(公噸/年)</td>";
-	str += "<td>粒狀物控制效率<br>(%)</td>";
-	str += "<td>SOx控制效率<br>(%)</td>";
-	str += "<td>NOx控制效率<br>(%)</td>";
-	str += "<td>THC控制效率<br>(%)</td>";
-	str += "<td>CO控制效率<br>(%)</td>";
-	str += "<td>PB控制效率<br>(%)</td>";
+	str +="<th>公司名稱</th>";
+	str += "<th>汙染源編號</th>";
+	str += "<th>TSP<br>(公噸/年)</th>";
+	str += "<th>PM10<br>(公噸/年)</th>";
+	str += "<th>PM6<br>(公噸/年)</th>";
+	str += "<th>PM2.5<br>(公噸/年)</th>";
+	str += "<th>SOx<br>(公噸/年)</th>";
+	str += "<th>NOx<br>(公噸/年)</th>";
+	str += "<th>THC<br>(公噸/年)</th>";
+	str += "<th>NMHC<br>(公噸/年)</th>";
+	str += "<th>CO<br>(公噸/年)</th>";
+	str += "<th>PB<br>(公噸/年)</th>";
+	str += "<th>粒狀物控制效率<br>(%)</th>";
+	str += "<th>SOx控制效率<br>(%)</th>";
+	str += "<th>NOx控制效率<br>(%)</th>";
+	str += "<th>THC控制效率<br>(%)</th>";
+	str += "<th>CO控制效率<br>(%)</th>";
+	str += "<th>PB控制效率<br>(%)</th>";
 	str += "</tr>";
 
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
 		str += "<tr>";
-		str += "<td>"+d.COMP_NAM+"</td>";
-		str += "<td>"+d.NO_P+"</td>";
-		str += "<td>"+d.TSP_EMI+"</td>";
-		str += "<td>"+d.PM_EMI+"</td>";
-		str += "<td>"+d.PM6_EMI+"</td>";
-		str += "<td>"+d.PM25_EMI+"</td>";
-		str += "<td>"+d.SOX_EMI+"</td>";
-		str += "<td>"+d.NOX_EMI+"</td>";
-		str += "<td>"+d.THC_EMI+"</td>";
-		str += "<td>"+d.NMHC_EMI+"</td>";
-		str += "<td>"+d.CO_EMI+"</td>";
-		str += "<td>"+d.PB_EMI+"</td>";
-		str += "<td>"+d.TSP_EFF+"</td>";
-		str += "<td>"+d.SOX_EFF+"</td>";
-		str += "<td>"+d.NOX_EFF+"</td>";
-		str += "<td>"+d.THC_EFF+"</td>";
-		str += "<td>"+d.CO_EFF+"</td>";
-		str += "<td>"+d.PB_EFF+"</td>";
+		str += "<td title='公司名稱'>"+d.COMP_NAM+"</td>";
+		str += "<td title='汙染源編號'>"+d.NO_P+"</td>";
+		str += "<td title='TSP(公噸/年)'>"+d.TSP_EMI+"</td>";
+		str += "<td title='PM10(公噸/年)'>"+d.PM_EMI+"</td>";
+		str += "<td title='PM6(公噸/年)'>"+d.PM6_EMI+"</td>";
+		str += "<td title='PM2.5(公噸/年)'>"+d.PM25_EMI+"</td>";
+		str += "<td title='SOx(公噸/年)'>"+d.SOX_EMI+"</td>";
+		str += "<td title='NOx(公噸/年)'>"+d.NOX_EMI+"</td>";
+		str += "<td title='THC(公噸/年)'>"+d.THC_EMI+"</td>";
+		str += "<td title='NMHC(公噸/年)'>"+d.NMHC_EMI+"</td>";
+		str += "<td title='CO(公噸/年)'>"+d.CO_EMI+"</td>";
+		str += "<td title='PB(公噸/年)'>"+d.PB_EMI+"</td>";
+		str += "<td title='粒狀物控制效率(%)'>"+d.TSP_EFF+"</td>";
+		str += "<td title='SOx控制效率(%)'>"+d.SOX_EFF+"</td>";
+		str += "<td title='NOx控制效率(%)'>"+d.NOX_EFF+"</td>";
+		str += "<td title='THC控制效率(%)'>"+d.THC_EFF+"</td>";
+		str += "<td title='CO控制效率(%)'>"+d.CO_EFF+"</td>";
+		str += "<td title='PB控制效率(%)'>"+d.PB_EFF+"</td>";
 	}
 	str += "</table>";
 	return str;
@@ -91,38 +100,24 @@ function GenPointTable(data){
 function GenLineTable(data){
 	var str = "<table>";
 	str += "<tr>";
-	str +="<td>車種別</td>";
-	str += "<td>道路別</td>";
-	str += "<td>TSP<br>(公噸/年)</td>";
-	str += "<td>PM10<br>(公噸/年)</td>";
-	str += "<td>PM6<br>(公噸/年)</td>";
-	str += "<td>PM2.5<br>(公噸/年)</td>";
-	str += "<td>SOx<br>(公噸/年)</td>";
-	str += "<td>NOx<br>(公噸/年)</td>";
-	str += "<td>THC<br>(公噸/年)</td>";
-	str += "<td>NMHC<br>(公噸/年)</td>";
-	str += "<td>HC尾氣排放<br>(公噸/年)</td>";
-	str += "<td>HC蒸發損失<br>(公噸/年)</td>";
-	str += "<td>HC行駛損失<br>(公噸/年)</td>";
-	str += "<td>HC停等損失<br>(公噸/年)</td>";
-	str += "<td>CO<br>(公噸/年)</td>";
-	str += "<td>PB<br>(公噸/年)</td>";
+	str +="<th>車種別</th>";
+	str += "<th>道路別</th>";
+	str += "<th>TSP<br>(公噸/年)</th>";
+	str += "<th>PM10<br>(公噸/年)</th>";
+	str += "<th>PM6<br>(公噸/年)</th>";
+	str += "<th>PM2.5<br>(公噸/年)</th>";
+	str += "<th>SOx<br>(公噸/年)</th>";
+	str += "<th>NOx<br>(公噸/年)</th>";
+	str += "<th>THC<br>(公噸/年)</th>";
+	str += "<th>NMHC<br>(公噸/年)</th>";
+	str += "<th>HC尾氣排放<br>(公噸/年)</th>";
+	str += "<th>HC蒸發損失<br>(公噸/年)</th>";
+	str += "<th>HC行駛損失<br>(公噸/年)</th>";
+	str += "<th>HC停等損失<br>(公噸/年)</th>";
+	str += "<th>CO<br>(公噸/年)</th>";
+	str += "<th>PB<br>(公噸/年)</th>";
 	str += "</tr>";
 
-	var nsc = {};
-	nsc.pldgv = "自用小客車-汽油";
-	nsc.plddv = "自用小客車-柴油";
-	nsc.bldgv = "計程車";
-	nsc.bldlpg = "LPG小客車";
-	nsc.ldgt = "汽油小貨車";
-	nsc.lddt = "柴油小貨車";
-	nsc.hdgv = "柴油大客車";
-	nsc.hddt = "柴油大貨車";
-	nsc.bus = "公車/客運車";
-	nsc.mc2 = "二行程機車";
-	nsc.mc4 = "四行程機車";
-	nsc.ldsv = "輕型特種車";
-	nsc.hdsv = "重型特種車";
 	var road = {};
 	road["1"] = "國道";
 	road["2"] = "省道";
@@ -132,22 +127,22 @@ function GenLineTable(data){
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
 		str += "<tr>";
-		str += "<td>"+nsc[d.NSC.toLowerCase()]+"</td>";
-		str += "<td>"+road[d.NSC_SUB]+"</td>";
-		str += "<td>"+d.EM_TSP+"</td>";
-		str += "<td>"+d.EM_PM+"</td>";
-		str += "<td>"+d.EM_PM6+"</td>";
-		str += "<td>"+d.EM_PM25+"</td>";
-		str += "<td>"+d.EM_SOX+"</td>";
-		str += "<td>"+d.EM_NOX+"</td>";
-		str += "<td>"+d.EM_THC+"</td>";
-		str += "<td>"+d.EM_NMHC+"</td>";
-		str += "<td>"+d.EM_EXHC+"</td>";
-		str += "<td>"+d.EM_EHC+"</td>";
-		str += "<td>"+d.EM_RHC+"</td>";
-		str += "<td>"+d.EM_RST+"</td>";
-		str += "<td>"+d.EM_CO+"</td>";
-		str += "<td>"+d.EM_PB+"</td>";
+		str += "<td title='車種別'>"+g_CarType[d.NSC.toLowerCase()]+"</td>";
+		str += "<td title='道路別'>"+road[d.NSC_SUB]+"</td>";
+		str += "<td title='TSP(公噸/年)'>"+d.EM_TSP+"</td>";
+		str += "<td title='PM10(公噸/年)'>"+d.EM_PM+"</td>";
+		str += "<td title='PM6(公噸/年)'>"+d.EM_PM6+"</td>";
+		str += "<td title='PM2.5(公噸/年)'>"+d.EM_PM25+"</td>";
+		str += "<td title='SOx(公噸/年)'>"+d.EM_SOX+"</td>";
+		str += "<td title='NOx(公噸/年)'>"+d.EM_NOX+"</td>";
+		str += "<td title='THC(公噸/年)'>"+d.EM_THC+"</td>";
+		str += "<td title='NMHC(公噸/年)'>"+d.EM_NMHC+"</td>";
+		str += "<td title='HC尾氣排放(公噸/年)'>"+d.EM_EXHC+"</td>";
+		str += "<td title='HC蒸發損失(公噸/年)'>"+d.EM_EHC+"</td>";
+		str += "<td title='HC行駛損失(公噸/年)'>"+d.EM_RHC+"</td>";
+		str += "<td title='HC停等損失(公噸/年)'>"+d.EM_RST+"</td>";
+		str += "<td title='CO(公噸/年)'>"+d.EM_CO+"</td>";
+		str += "<td title='PB(公噸/年)'>"+d.EM_PB+"</td>";
 	}
 	str += "</table>";
 	return str;
@@ -156,17 +151,17 @@ function GenLineTable(data){
 function GenAreaTable(data){
 	var str = "<table>";
 	str += "<tr>";
-	str +="<td>面源種類</td>";
-	str += "<td>TSP<br>(公噸/年)</td>";
-	str += "<td>PM10<br>(公噸/年)</td>";
-	str += "<td>PM6<br>(公噸/年)</td>";
-	str += "<td>PM2.5<br>(公噸/年)</td>";
-	str += "<td>SOx<br>(公噸/年)</td>";
-	str += "<td>NOx<br>(公噸/年)</td>";
-	str += "<td>THC<br>(公噸/年)</td>";
-	str += "<td>NMHC<br>(公噸/年)</td>";
-	str += "<td>CO<br>(公噸/年)</td>";
-	str += "<td>PB<br>(公噸/年)</td>";
+	str +="<th>面源種類</th>";
+	str += "<th>TSP<br>(公噸/年)</th>";
+	str += "<th>PM10<br>(公噸/年)</th>";
+	str += "<th>PM6<br>(公噸/年)</th>";
+	str += "<th>PM2.5<br>(公噸/年)</th>";
+	str += "<th>SOx<br>(公噸/年)</th>";
+	str += "<th>NOx<br>(公噸/年)</th>";
+	str += "<th>THC<br>(公噸/年)</th>";
+	str += "<th>NMHC<br>(公噸/年)</th>";
+	str += "<th>CO<br>(公噸/年)</th>";
+	str += "<th>PB<br>(公噸/年)</th>";
 	str += "</tr>";
 
 	for(var i=0;i<data.length;i++){
@@ -174,17 +169,17 @@ function GenAreaTable(data){
 		var type = d.NSC;
 		if(d.NSC_SUB) type += d.NSC_SUB;
 		str += "<tr>";
-		str += "<td>"+(g_AreaType[type]?g_AreaType[type]:type)+"</td>";
-		str += "<td>"+d.EM_TSP+"</td>";
-		str += "<td>"+d.EM_PM+"</td>";
-		str += "<td>"+d.EM_PM6+"</td>";
-		str += "<td>"+d.EM_PM25+"</td>";
-		str += "<td>"+d.EM_SOX+"</td>";
-		str += "<td>"+d.EM_NOX+"</td>";
-		str += "<td>"+d.EM_THC+"</td>";
-		str += "<td>"+d.EM_NMHC+"</td>";
-		str += "<td>"+d.EM_CO+"</td>";
-		str += "<td>"+d.EM_PB+"</td>";
+		str += "<td title='面源種類'>"+(g_AreaType[type]?g_AreaType[type]:type)+"</td>";
+		str += "<td title='TSP(公噸/年)'>"+d.EM_TSP+"</td>";
+		str += "<td title='PM10(公噸/年)'>"+d.EM_PM+"</td>";
+		str += "<td title='PM6(公噸/年)'>"+d.EM_PM6+"</td>";
+		str += "<td title='PM2.5(公噸/年)'>"+d.EM_PM25+"</td>";
+		str += "<td title='SOx(公噸/年)'>"+d.EM_SOX+"</td>";
+		str += "<td title='NOx(公噸/年)'>"+d.EM_NOX+"</td>";
+		str += "<td title='THC(公噸/年)'>"+d.EM_THC+"</td>";
+		str += "<td title='NMHC(公噸/年)'>"+d.EM_NMHC+"</td>";
+		str += "<td title='CO(公噸/年)'>"+d.EM_CO+"</td>";
+		str += "<td title='PB(公噸/年)'>"+d.EM_PB+"</td>";
 	}
 	str += "</table>";
 	return str;
@@ -193,20 +188,20 @@ function GenAreaTable(data){
 function GenBioTable(data){
 	var str = "<table>";
 	str += "<tr>";
-	str += "<td>總非甲烷碳氫有機氣體<br>(公噸/年)</td>";
-	str += "<td>異戊二烯(Isoprene)<br>(公噸/年)</td>";
-	str += "<td>單帖類(Monoterpenes)<br>(公噸/年)</td>";
-	str += "<td>其他非甲烷碳氫有機氣體<br>(公噸/年)</td>";
-	str += "<td>甲基-丁烯-醇(Methyl-Buten-Ol)<br>(公噸/年)</td>";
+	str += "<th>總非甲烷碳氫有機氣體<br>(公噸/年)</th>";
+	str += "<th>異戊二烯(Isoprene)<br>(公噸/年)</th>";
+	str += "<th>單帖類(Monoterpenes)<br>(公噸/年)</th>";
+	str += "<th>其他非甲烷碳氫有機氣體<br>(公噸/年)</th>";
+	str += "<th>甲基-丁烯-醇(Methyl-Buten-Ol)<br>(公噸/年)</th>";
 	str += "</tr>";
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
 		str += "<tr>";
-		str += "<td>"+d.TOTAL_NMHC+"</td>";
-		str += "<td>"+d.ISO+"</td>";
-		str += "<td>"+d.MONO+"</td>";
-		str += "<td>"+d.ONMHC+"</td>";
-		str += "<td>"+d.MBO+"</td>";
+		str += "<td title='總非甲烷碳氫有機氣體(公噸/年)'>"+d.TOTAL_NMHC+"</td>";
+		str += "<td title='異戊二烯(Isoprene)(公噸/年)'>"+d.ISO+"</td>";
+		str += "<td title='單帖類(Monoterpenes)(公噸/年)'>"+d.MONO+"</td>";
+		str += "<td title='其他非甲烷碳氫有機氣體(公噸/年)'>"+d.ONMHC+"</td>";
+		str += "<td title='甲基-丁烯-醇(Methyl-Buten-Ol)(公噸/年)'>"+d.MBO+"</td>";
 	}
 	str += "</table>";
 	return str;
@@ -215,14 +210,14 @@ function GenBioTable(data){
 function GenNH3Table(data){
 	var str = "<table>";
 	str += "<tr>";
-	str += "<td>氨源種類</td>";
-	str += "<td>NH3<br>(公噸/年)</td>";
+	str += "<th>氨源種類</th>";
+	str += "<th>NH3<br>(公噸/年)</th>";
 	str += "</tr>";
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
 		str += "<tr>";
-		str += "<td>"+(g_NH3Type[d.NSC]?g_NH3Type[d.NSC]:d.NSC)+"</td>";
-		str += "<td>"+d.EM_NH3+"</td>";
+		str += "<td title='氨源種類'>"+(g_NH3Type[d.NSC]?g_NH3Type[d.NSC]:d.NSC)+"</td>";
+		str += "<td title='NH3(公噸/年)'>"+d.EM_NH3+"</td>";
 	}
 	str += "</table>";
 	return str;
@@ -231,17 +226,17 @@ function GenNH3Table(data){
 function GenSumTable(data){
 	var str = "<table>";
 	str += "<tr>";
-	str += "<td>汙染源</td>";
-	str += "<td>TSP<br>(公噸/年)</td>";
-	str += "<td>PM10<br>(公噸/年)</td>";
-	str += "<td>PM6<br>(公噸/年)</td>";
-	str += "<td>PM2.5<br>(公噸/年)</td>";
-	str += "<td>SOx<br>(公噸/年)</td>";
-	str += "<td>NOx<br>(公噸/年)</td>";
-	str += "<td>THC<br>(公噸/年)</td>";
-	str += "<td>NMHC<br>(公噸/年)</td>";
-	str += "<td>CO<br>(公噸/年)</td>";
-	str += "<td>PB<br>(公噸/年)</td>";
+	str += "<th>汙染源</th>";
+	str += "<th>TSP<br>(公噸/年)</th>";
+	str += "<th>PM10<br>(公噸/年)</th>";
+	str += "<th>PM6<br>(公噸/年)</th>";
+	str += "<th>PM2.5<br>(公噸/年)</th>";
+	str += "<th>SOx<br>(公噸/年)</th>";
+	str += "<th>NOx<br>(公噸/年)</th>";
+	str += "<th>THC<br>(公噸/年)</th>";
+	str += "<th>NMHC<br>(公噸/年)</th>";
+	str += "<th>CO<br>(公噸/年)</th>";
+	str += "<th>PB<br>(公噸/年)</th>";
 	str += "</tr>";
 	var type = {};
 	type.POINT = "點源";
@@ -250,17 +245,17 @@ function GenSumTable(data){
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
 		str += "<tr>";
-		str += "<td>"+type[d.TYPE]+"</td>";
-		str += "<td>"+d.TSP+"</td>";
-		str += "<td>"+d.PM+"</td>";
-		str += "<td>"+d.PM6+"</td>";
-		str += "<td>"+d.PM25+"</td>";
-		str += "<td>"+d.SOX+"</td>";
-		str += "<td>"+d.NOX+"</td>";
-		str += "<td>"+d.THC+"</td>";
-		str += "<td>"+d.NMHC+"</td>";
-		str += "<td>"+d.CO+"</td>";
-		str += "<td>"+d.PB+"</td>";
+		str += "<td title='汙染源'>"+type[d.TYPE]+"</td>";
+		str += "<td title='TSP(公噸/年)'>"+d.TSP+"</td>";
+		str += "<td title='PM10(公噸/年)'>"+d.PM+"</td>";
+		str += "<td title='PM6(公噸/年)'>"+d.PM6+"</td>";
+		str += "<td title='PM2.5(公噸/年)'>"+d.PM25+"</td>";
+		str += "<td title='SOx(公噸/年)'>"+d.SOX+"</td>";
+		str += "<td title='NOx(公噸/年)'>"+d.NOX+"</td>";
+		str += "<td title='THC(公噸/年)'>"+d.THC+"</td>";
+		str += "<td title='NMHC(公噸/年)'>"+d.NMHC+"</td>";
+		str += "<td title='CO(公噸/年)'>"+d.CO+"</td>";
+		str += "<td title='PB(公噸/年)'>"+d.PB+"</td>";
 	}
 	str += "</table>";
 	return str;
@@ -303,10 +298,29 @@ function CloseDetailPanel(){
 	});
 }
 
+function UpdateStatisticGraph(){
+	DrawGraphTotal(g_StatData.TOTAL);
+	DrawGraphCity(g_StatData.CITY);
+	DrawGraphIndustry(g_StatData.INDUSTRY);
+	DrawGraphCompany(g_StatData.COMPANY);
+	DrawGraphTraffic(g_StatData.TRAFFIC);
+	DrawGraphArea(g_StatData.AREA);
+}
+
 function OpenStatisticPanel(){
 	var panel = $("#statisticPanel");
 	panel.css("display","block");
 	panel.animate({"height":"90%", "opacity":1});
+
+	if(!g_StatData){
+		$.get("/data/statistic.json", function(data){
+			g_StatData = data;
+			UpdateStatisticGraph();
+		});
+	}
+	else{
+		UpdateStatisticGraph();
+	}
 }
 
 function CloseStatisticPanel(){
@@ -516,7 +530,31 @@ window.addEventListener('load', function() {
 		UpdateMapGrid();
 	});
 
-	LoadAreaType();
+	$("#selPolluteTotal").change(function(){
+		DrawGraphTotal(g_StatData.TOTAL);
+	});
+
+	$("#selPolluteCity").change(function(){
+		DrawGraphCity(g_StatData.CITY);
+	});
+
+	$("#selPolluteIndustry").change(function(){
+		DrawGraphIndustry(g_StatData.INDUSTRY);
+	});
+
+	$("#selPolluteCompany").change(function(){
+		DrawGraphCompany(g_StatData.COMPANY);
+	});
+
+	$("#selPolluteTraffic").change(function(){
+		DrawGraphTraffic(g_StatData.TRAFFIC);
+	});
+
+	$("#selPolluteArea").change(function(){
+		DrawGraphArea(g_StatData.AREA);
+	});
+
+	LoadIDMap();
 	UpdateSenseRange();
 	UpdatePolluteOption();
 });

@@ -76,7 +76,7 @@ html, body {
 	}
 }
 
-@mixin panel(){
+#controlPanel{
 	position: absolute;
 	display: block;
 	max-width: 100%;
@@ -102,9 +102,7 @@ html, body {
 	}
 	-webkit-transition: left $transition-time ease;
     transition: left $transition-time ease;
-}
-#controlPanel{
-	@include panel;
+
 	bottom: 65px;
 	left: 0px;
 	width: 350px;
@@ -115,7 +113,7 @@ html, body {
 	}
 }
 
-.detail-panel{
+@mixin panel(){
 	display: none;
     position: fixed;
     top: 50%;
@@ -142,6 +140,10 @@ html, body {
             background-color: rgb(200,200,200);
         }
     }
+}
+
+.detail-panel{
+	@include panel();
 
     .detail-info{
     	height: 100%;
@@ -176,3 +178,32 @@ html, body {
     	}
     }
 }
+
+.stat-panel{
+	@include panel();
+	overflow: auto;
+	.half-width{
+		display: inline-block;
+		margin: 20px auto;
+		
+		width: calc(100% - 20px);
+		@include pc-width{
+	        width: calc(50% - 25px);
+	    }
+	}
+	.graph-container{
+		position: relative;
+		.select-container{
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			padding: 5px;
+		}
+		.stat-graph{
+			width: 100%;
+			height: 400px;
+		}
+	}
+	
+}
+
