@@ -1,6 +1,11 @@
 var g_TransTime = 500;
+var g_DrawCityType = "RANK";
+var g_DrawCityID = "";
+var g_DrawDictType = "ROUGH";
+var g_DrawDictID = "";
+var g_DrawDictSource = "POINT";
 
-//param: graphID, infoID, width, height, data
+//param: title, graphID, infoID, width, height, data, clickFn
 function DrawPieChart(param){
 	var svg = d3.select("#"+param.graphID);
 	if(svg.select(".group").empty()){
@@ -11,11 +16,22 @@ function DrawPieChart(param){
 	else{
 		svg = svg.select(".group");
 	}
+	var inRadius = 0;
+	if(param.title){
+		inRadius = 100;
+		svg.append("text")
+			.attr("fill","#ffffff")
+			.attr("text-anchor","middle")
+			.attr("alignment-baseline", "baseline")
+			.attr("x", 0)
+			.attr("y", 0)
+			.text(param.title);
+	}
 
 	var radius = Math.min(param.width,param.height)*0.5;
 	var arc = d3.svg.arc()
 	    .outerRadius(radius - 10)
-	    .innerRadius(0);
+	    .innerRadius(inRadius);
 
 	var pie = d3.layout.pie()
 	    .sort(null)
@@ -70,9 +86,13 @@ function DrawPieChart(param){
 				return arc(i(t));;
 			};
 		});
+
+	if(param.clickFn){
+		update.select("path").on("click", param.clickFn);
+	}
 }
 
-//param: graphID, infoID, width, height, data, offsetX, offsetY
+//param: graphID, infoID, width, height, data, offsetX, offsetY, clickFn
 function DrawBarChart(param){
 	var rectH = (param.height-param.offsetY)/param.data.length;
 
@@ -137,6 +157,10 @@ function DrawBarChart(param){
 		.attr("x", function(d){return param.offsetX;})
 		.attr("y", function(d,i){return param.offsetY+i*rectH;});
 
+	if(param.clickFn){
+		rect.select("rect").on("click", param.clickFn);
+	}
+
 	var text = svg.selectAll(".text").data(param.data);
 
 	text.enter().append("g")
@@ -176,12 +200,34 @@ function DrawGraphTotal(data){
 	DrawPieChart(param);
 }
 
-function DrawGraphCity(data){
-	//console.log(data);
+//處理縣市合併
+function CheckCityMerge(no){
+	var id = no;
+	if(no == "36"){	//台中
+		id = "17";
+	}
+	if(no == "41"){	//台南
+		id = "21";
+	}
+	if(no == "42"){	//高雄
+		id = "02";
+	}
+	return id;
+}
+
+function CityBackClick(){
+	var graph = $("#graphCity");
+	graph.html("");
+	g_DrawCityType = "RANK";
+	DrawGraphCity(g_StatData.CITY);
+	$("#backCity").css("display","none");
+}
+
+function DrawCityRank(data){
 	var graph = $("#graphCity");
 	var width = graph.width();
 	var height = graph.height();
-	var offsetX = 50;
+	var offsetX = 60;
 	var offsetY = 50;
 
 	//prepare data
@@ -190,8 +236,11 @@ function DrawGraphCity(data){
 
 	var citySum = {};
 	for(var key in data){
-		var value = data[key][pollute];
-		var cityNo = key.substr(0,2)+"00";
+		var value = 0;
+		if(data[key]["POINT"][pollute]) value += data[key]["POINT"][pollute];
+		if(data[key]["LINE"][pollute]) value += data[key]["LINE"][pollute];
+		if(data[key]["AREA"][pollute]) value += data[key]["AREA"][pollute];
+		var cityNo = CheckCityMerge(key.substr(0,2)) + "00";
 		if(cityNo in citySum){
 			citySum[cityNo] += value;
 		}
@@ -203,7 +252,7 @@ function DrawGraphCity(data){
 	for(var key in citySum){
 		var value = citySum[key];
 		var name = (key in g_CityName)?g_CityName[key]:"不明";
-		graphData.push({key: name, value: value});
+		graphData.push({key: name, value: value, id: key});
 	}
 	graphData.sort(function(a,b){return b.value-a.value;});
 
@@ -216,7 +265,276 @@ function DrawGraphCity(data){
 	param.data = graphData;
 	param.offsetX = offsetX;
 	param.offsetY = offsetY;
+	param.clickFn = function(d){
+		graph.html("");
+		g_DrawCityType = "RATIO";
+		g_DrawCityID = d.id;
+		$("#backCity").css("display","block");
+		DrawGraphCity(data);
+	}
 	DrawBarChart(param);
+}
+
+function DrawCityRatio(data){
+	var graph = $("#graphCity");
+	var width = graph.width();
+	var height = graph.height();
+
+	//prepare data
+	var pollute = $("#selPolluteCity").val();
+	var graphData = [];
+
+	var citySum = {"POINT":0, "LINE":0, "AREA":0};
+	var cityName = g_CityName[g_DrawCityID];
+	for(var key in data){
+		var cityNo = CheckCityMerge(key.substr(0,2)) + "00";
+		if(cityNo == g_DrawCityID){
+			if(data[key]["POINT"][pollute]) citySum["POINT"] += data[key]["POINT"][pollute];
+			if(data[key]["LINE"][pollute]) citySum["LINE"] += data[key]["LINE"][pollute];
+			if(data[key]["AREA"][pollute]) citySum["AREA"] += data[key]["AREA"][pollute];
+		}
+	}
+
+	graphData.push({key: "點源", value: citySum["POINT"]});
+	graphData.push({key: "線源", value: citySum["LINE"]});
+	graphData.push({key: "面源", value: citySum["AREA"]});
+
+	//param: graphID, infoID, width, height, data
+	var param = {};
+	param.graphID = "graphCity";
+	param.infoID = "infoCity";
+	param.width = width;
+	param.height = height;
+	param.data = graphData;
+	param.title = cityName;
+	DrawPieChart(param);
+}
+
+function DrawGraphCity(data){
+	//console.log(data);
+	switch(g_DrawCityType){
+		case "RANK":
+			DrawCityRank(data);
+			break;
+		case "RATIO":
+			DrawCityRatio(data);
+			break;
+	}
+}
+
+function DictBackClick(){
+	var graph = $("#graphDict");
+	graph.html("");
+	switch(g_DrawDictType){
+		case "ROUGH":
+			break;
+		case "FINE":
+			g_DrawDictType = "ROUGH";
+			$("#backDict").css("display","none");
+			break;
+		case "SOURCE":
+			g_DrawDictID = CheckCityMerge(g_DrawDictID.substr(0,2))+"00";
+			g_DrawDictType = "FINE";
+			break;
+		case "DETAIL":
+			g_DrawDictType = "SOURCE";
+			break;
+	}
+	DrawGraphDict(g_StatData.CITY);
+}
+
+function DrawDictRough(data){
+	var graph = $("#graphDict");
+	var width = graph.width();
+	var height = graph.height();
+
+	//prepare data
+	var pollute = $("#selPolluteDict").val();
+	var graphData = [];
+
+	var dictSum = {};
+	for(var key in data){
+		var value = 0;
+		if(data[key]["POINT"][pollute]) value += data[key]["POINT"][pollute];
+		if(data[key]["LINE"][pollute]) value += data[key]["LINE"][pollute];
+		if(data[key]["AREA"][pollute]) value += data[key]["AREA"][pollute];
+		var dictNo = CheckCityMerge(key.substr(0,2)) + "00";
+		if(dictNo in dictSum){
+			dictSum[dictNo] += value;
+		}
+		else{
+			dictSum[dictNo] = value;
+		}
+	}
+
+	for(var key in dictSum){
+		var value = dictSum[key];
+		var name = (key in g_CityName)?g_CityName[key]:"不明";
+		graphData.push({key: name, value: value, id: key});
+	}
+	graphData.sort(function(a,b){return b.value-a.value;});
+
+	//param: graphID, infoID, width, height, data
+	var param = {};
+	param.graphID = "graphDict";
+	param.infoID = "infoDict";
+	param.width = width;
+	param.height = height;
+	param.data = graphData;
+	param.clickFn = function(d){
+		graph.html("");
+		g_DrawDictType = "FINE";
+		$("#backDict").css("display","block");
+		g_DrawDictID = d.data.id;
+		DrawGraphDict(data);
+	}
+	DrawPieChart(param);
+}
+
+function DrawDictFine(data){
+	var graph = $("#graphDict");
+	var width = graph.width();
+	var height = graph.height();
+
+	//prepare data
+	var pollute = $("#selPolluteDict").val();
+	var graphData = [];
+
+	var dictSum = {};
+	for(var key in data){
+		var dictNo = CheckCityMerge(key.substr(0,2)) + "00";
+		if(g_DrawDictID == dictNo){
+			var value = 0;
+			if(data[key]["POINT"][pollute]) value += data[key]["POINT"][pollute];
+			if(data[key]["LINE"][pollute]) value += data[key]["LINE"][pollute];
+			if(data[key]["AREA"][pollute]) value += data[key]["AREA"][pollute];
+			
+			if(key in dictSum){
+				dictSum[key] += value;
+			}
+			else{
+				dictSum[key] = value;
+			}
+		}
+	}
+
+	for(var key in dictSum){
+		var value = dictSum[key];
+		var name = (key in g_CityName)?g_CityName[key]:"不明";
+		graphData.push({key: name, value: value, id: key});
+	}
+	graphData.sort(function(a,b){return b.value-a.value;});
+
+	//param: graphID, infoID, width, height, data
+	var param = {};
+	param.graphID = "graphDict";
+	param.infoID = "infoDict";
+	param.width = width;
+	param.height = height;
+	param.data = graphData;
+	param.title = g_CityName[g_DrawDictID];
+	param.clickFn = function(d){
+		graph.html("");
+		g_DrawDictType = "SOURCE";
+		g_DrawDictID = d.data.id;
+		DrawGraphDict(data);
+	}
+	DrawPieChart(param);
+}
+
+function DrawDictSource(data){
+	var graph = $("#graphDict");
+	var width = graph.width();
+	var height = graph.height();
+
+	//prepare data
+	var pollute = $("#selPolluteDict").val();
+	var graphData = [];
+
+	var dict = data[g_DrawDictID];
+	if(dict["POINT"][pollute]){
+		graphData.push({key: "點源", value: dict["POINT"][pollute], source: "POINT"});
+	}
+	if(dict["LINE"][pollute]){
+		graphData.push({key: "線源", value: dict["LINE"][pollute], source: "LINE"});
+	}
+	if(dict["AREA"][pollute]){
+		graphData.push({key: "面源", value: dict["AREA"][pollute], source: "AREA"});
+	}
+
+	//param: graphID, infoID, width, height, data
+	var param = {};
+	param.graphID = "graphDict";
+	param.infoID = "infoDict";
+	param.width = width;
+	param.height = height;
+	param.data = graphData;
+	param.title = g_CityName[g_DrawDictID];
+	param.clickFn = function(d){
+		graph.html("");
+		g_DrawDictType = "DETAIL";
+		g_DrawDictSource = d.data.source;
+		DrawGraphDict(data);
+	}
+	DrawPieChart(param);
+}
+
+function DrawDictDetail(){
+	var no = g_DrawDictID.substr(0,2);
+	$.get("data/city_"+no+".json", function(data){
+		//console.log(data);
+		var graph = $("#graphDict");
+		var width = graph.width();
+		var height = graph.height();
+		var offsetX = 220;
+		var offsetY = 50;
+
+		//prepare data
+		var pollute = $("#selPolluteDict").val();
+		var detail = data[g_DrawDictID][g_DrawDictSource][pollute];
+
+		var graphData = [];
+
+		for(var i=0;i<detail.length;i++){
+			var d = detail[i];
+			var value = d.SUM;
+			var key;
+			switch(g_DrawDictSource){
+				case "POINT": key = d.NAME; break;
+				case "LINE": key = g_CarType[d.ID]; break;
+				case "AREA": key = g_AreaType[d.ID]; break;
+			}
+			graphData.push({key: key, value: value});
+		}
+
+		//param: graphID, infoID, width, height, data, offsetX, offsetY
+		var param = {};
+		param.graphID = "graphDict";
+		param.infoID = "infoDict";
+		param.width = width;
+		param.height = height;
+		param.data = graphData;
+		param.offsetX = offsetX;
+		param.offsetY = offsetY;
+		DrawBarChart(param);
+
+	});
+}
+
+function DrawGraphDict(data){
+	switch(g_DrawDictType){
+		case "ROUGH":
+			DrawDictRough(data);
+			break;
+		case "FINE":
+			DrawDictFine(data);
+			break;
+		case "SOURCE":
+			DrawDictSource(data);
+			break;
+		case "DETAIL":
+			DrawDictDetail();
+	}
 }
 
 function DrawGraphIndustry(data){
@@ -258,7 +576,7 @@ function DrawGraphCompany(data){
 	var graph = $("#graphCompany");
 	var width = graph.width();
 	var height = graph.height();
-	var offsetX = 250;
+	var offsetX = 220;
 	var offsetY = 50;
 
 	//prepare data
@@ -315,7 +633,7 @@ function DrawGraphArea(data){
 	var graph = $("#graphArea");
 	var width = graph.width();
 	var height = graph.height();
-	var offsetX = 250;
+	var offsetX = 180;
 	var offsetY = 50;
 
 	//prepare data

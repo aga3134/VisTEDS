@@ -73,6 +73,10 @@ function GenPointTable(data){
 
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
+		//skip沒有排放的資料
+		if(d.TSP_EMI == 0 && d.PM_EMI == 0 && d.PM6_EMI == 0 && d.PM25_EMI == 0 &&
+			d.SOX_EMI == 0 && d.NOX_EMI == 0 && d.THC_EMI == 0 && d.NMHC_EMI == 0 &&
+			d.CO_EMI == 0 && d.PB_EMI == 0) continue;
 		str += "<tr>";
 		str += "<td title='公司名稱'>"+d.COMP_NAM+"</td>";
 		str += "<td title='汙染源編號'>"+d.NO_P+"</td>";
@@ -126,6 +130,11 @@ function GenLineTable(data){
 
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
+		//skip沒有排放的資料
+		if(d.EM_TSP == 0 && d.EM_PM == 0 && d.EM_PM6 == 0 && d.EM_PM25 == 0 &&
+			d.EM_SOX == 0 && d.EM_NOX == 0 && d.EM_THC == 0 && d.EM_NMHC == 0 &&
+			d.EM_EXHC == 0 && d.EM_EHC == 0 && d.EM_RHC == 0 && d.EM_RST == 0 &&
+			d.EM_CO == 0 && d.EM_PB == 0) continue;
 		str += "<tr>";
 		str += "<td title='車種別'>"+g_CarType[d.NSC.toLowerCase()]+"</td>";
 		str += "<td title='道路別'>"+road[d.NSC_SUB]+"</td>";
@@ -166,6 +175,10 @@ function GenAreaTable(data){
 
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
+		//skip沒有排放的資料
+		if(d.EM_TSP == 0 && d.EM_PM == 0 && d.EM_PM6 == 0 && d.EM_PM25 == 0 &&
+			d.EM_SOX == 0 && d.EM_NOX == 0 && d.EM_THC == 0 && d.EM_NMHC == 0 &&
+			d.EM_CO == 0 && d.EM_PB == 0) continue;
 		var type = d.NSC;
 		if(d.NSC_SUB) type += d.NSC_SUB;
 		str += "<tr>";
@@ -196,6 +209,9 @@ function GenBioTable(data){
 	str += "</tr>";
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
+		//skip沒有排放的資料
+		if(d.TOTAL_NMHC == 0 && d.ISO == 0 && d.MONO == 0 && d.ONMHC == 0 &&
+			d.MBO == 0) continue;
 		str += "<tr>";
 		str += "<td title='總非甲烷碳氫有機氣體(公噸/年)'>"+d.TOTAL_NMHC+"</td>";
 		str += "<td title='異戊二烯(Isoprene)(公噸/年)'>"+d.ISO+"</td>";
@@ -215,6 +231,8 @@ function GenNH3Table(data){
 	str += "</tr>";
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
+		//skip沒有排放的資料
+		if(d.EM_NH3 == 0) continue;
 		str += "<tr>";
 		str += "<td title='氨源種類'>"+(g_NH3Type[d.NSC]?g_NH3Type[d.NSC]:d.NSC)+"</td>";
 		str += "<td title='NH3(公噸/年)'>"+d.EM_NH3+"</td>";
@@ -244,6 +262,10 @@ function GenSumTable(data){
 	type.AREA = "面源";
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
+		//skip沒有排放的資料
+		if(d.TSP == 0 && d.PM == 0 && d.PM6 == 0 && d.PM25 == 0 &&
+			d.SOX == 0 && d.NOX == 0 && d.THC == 0 && d.NMHC == 0 &&
+			d.CO == 0 && d.PB == 0) continue;
 		str += "<tr>";
 		str += "<td title='汙染源'>"+type[d.TYPE]+"</td>";
 		str += "<td title='TSP(公噸/年)'>"+d.TSP+"</td>";
@@ -301,6 +323,7 @@ function CloseDetailPanel(){
 function UpdateStatisticGraph(){
 	DrawGraphTotal(g_StatData.TOTAL);
 	DrawGraphCity(g_StatData.CITY);
+	DrawGraphDict(g_StatData.CITY);
 	DrawGraphIndustry(g_StatData.INDUSTRY);
 	DrawGraphCompany(g_StatData.COMPANY);
 	DrawGraphTraffic(g_StatData.TRAFFIC);
@@ -536,6 +559,10 @@ window.addEventListener('load', function() {
 
 	$("#selPolluteCity").change(function(){
 		DrawGraphCity(g_StatData.CITY);
+	});
+
+	$("#selPolluteDict").change(function(){
+		DrawGraphDict(g_StatData.CITY);
 	});
 
 	$("#selPolluteIndustry").change(function(){

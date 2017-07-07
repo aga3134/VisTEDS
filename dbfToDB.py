@@ -26,6 +26,9 @@ def GenValue(record, keyStr):
 
 def AccumulateData(src, dst, keyMap):
     for srcKey in keyMap:
+        if not (srcKey in src):
+            continue
+        
         dstKey = keyMap[srcKey]
         if dstKey in dst:
             dst[dstKey] += src[srcKey]
@@ -846,12 +849,28 @@ def DataStatistic(pointFile, lineFile, areaFile):
             companySum[C_NO] = data
 
         if DICT in citySum:
-            data = citySum[DICT]
-            AccumulateData(record, data, keyMap)
+            if C_NO in citySum[DICT]["POINT"]:
+                data = citySum[DICT]["POINT"][C_NO]
+                AccumulateData(record, data, keyMap)
+            else:
+                data = {"NAME": record["COMP_NAM"]}
+                AccumulateData(record, data, keyMap)
+                citySum[DICT]["POINT"][C_NO] = data
+                
+            dataSum = citySum[DICT]["SUM"]["POINT"]
+            AccumulateData(record, dataSum, keyMap)
+
         else:
-            data = {}
+            data = {"NAME": record["COMP_NAM"]}
             AccumulateData(record, data, keyMap)
-            citySum[DICT] = data
+            citySum[DICT] = {"POINT":{}, "LINE":{}, "AREA":{}, "SUM": {}}
+            citySum[DICT]["SUM"]["POINT"] = {}
+            citySum[DICT]["SUM"]["LINE"] = {}
+            citySum[DICT]["SUM"]["AREA"] = {}
+            
+            citySum[DICT]["POINT"][C_NO] = data
+            dataSum = citySum[DICT]["SUM"]["POINT"]
+            AccumulateData(record, dataSum, keyMap)
 
         if COMP_KIND1 in industrySum:
             data = industrySum[COMP_KIND1]
@@ -887,12 +906,27 @@ def DataStatistic(pointFile, lineFile, areaFile):
             carSum[NSC] = data
 
         if DICT in citySum:
-            data = citySum[DICT]
-            AccumulateData(record, data, keyMap)
+            if NSC in citySum[DICT]["LINE"]:
+                data = citySum[DICT]["LINE"][NSC]
+                AccumulateData(record, data, keyMap)
+            else:
+                data = {}
+                AccumulateData(record, data, keyMap)
+                citySum[DICT]["LINE"][NSC] = data
+                
+            dataSum = citySum[DICT]["SUM"]["LINE"]
+            AccumulateData(record, dataSum, keyMap)
         else:
             data = {}
             AccumulateData(record, data, keyMap)
-            citySum[DICT] = data
+            citySum[DICT] = {"POINT":{}, "LINE":{}, "AREA":{}, "SUM": {}}
+            citySum[DICT]["SUM"]["POINT"] = {}
+            citySum[DICT]["SUM"]["LINE"] = {}
+            citySum[DICT]["SUM"]["AREA"] = {}
+            
+            citySum[DICT]["LINE"][C_NO] = data
+            dataSum = citySum[DICT]["SUM"]["LINE"]
+            AccumulateData(record, dataSum, keyMap)
 
     #==========area source==========
     keyMap = {}
@@ -920,12 +954,27 @@ def DataStatistic(pointFile, lineFile, areaFile):
             areaSum[NSC] = data
 
         if DICT in citySum:
-            data = citySum[DICT]
-            AccumulateData(record, data, keyMap)
+            if NSC in citySum[DICT]["AREA"]:
+                data = citySum[DICT]["AREA"][NSC]
+                AccumulateData(record, data, keyMap)
+            else:
+                data = {}
+                AccumulateData(record, data, keyMap)
+                citySum[DICT]["AREA"][NSC] = data
+
+            dataSum = citySum[DICT]["SUM"]["AREA"]
+            AccumulateData(record, dataSum, keyMap)
         else:
             data = {}
             AccumulateData(record, data, keyMap)
-            citySum[DICT] = data
+            citySum[DICT] = {"POINT":{}, "LINE":{}, "AREA":{}, "SUM": {}}
+            citySum[DICT]["SUM"]["POINT"] = {}
+            citySum[DICT]["SUM"]["LINE"] = {}
+            citySum[DICT]["SUM"]["AREA"] = {}
+            
+            citySum[DICT]["AREA"][C_NO] = data
+            dataSum = citySum[DICT]["SUM"]["AREA"]
+            AccumulateData(record, dataSum, keyMap)
 
     #==========source sum============
     for key in companySum:
@@ -965,10 +1014,17 @@ def DataStatistic(pointFile, lineFile, areaFile):
     for key in keyArr:
         companyResult[key] = GenSortedData(companySum, key, limitNum)
 
+    cityResult = {}
+    for city in citySum:
+        cityResult[city] = {}
+        cityResult[city]["POINT"] = citySum[city]["SUM"]["POINT"]
+        cityResult[city]["LINE"] = citySum[city]["SUM"]["LINE"]
+        cityResult[city]["AREA"] = citySum[city]["SUM"]["AREA"]
+
     result["COMPANY"] = companyResult
     result["TRAFFIC"] = carSum
     result["AREA"] = areaSum
-    result["CITY"] = citySum
+    result["CITY"] = cityResult
 
     industryResult = {}
     for key in keyArr:
@@ -979,6 +1035,44 @@ def DataStatistic(pointFile, lineFile, areaFile):
 
     with open('data/statistic.json', 'w') as outfile:
         json.dump(result, outfile)
+
+    #==========output detail for each city==========
+    keyMap = {}
+    keyMap["TSP"] = "TSP"
+    keyMap["PM"] = "PM"
+    keyMap["PM6"] = "PM6"
+    keyMap["PM25"] = "PM25"
+    keyMap["SOX"] = "SOX"
+    keyMap["NOX"] = "NOX"
+    keyMap["THC"] = "THC"
+    keyMap["NMHC"] = "NMHC"
+    keyMap["CO"] = "CO"
+    keyMap["PB"] = "PB"
+    
+    cityDict = {}
+    for city in citySum:
+        #大行政區
+        no = city[0:2]
+        if not(no in cityDict):
+            cityDict[no] = {"SUM": {"POINT":{},"LINE":{}, "AREA":{}}}
+
+        dictSum = cityDict[no]["SUM"]
+        AccumulateData(citySum[city]["SUM"]["POINT"], dictSum["POINT"], keyMap)
+        AccumulateData(citySum[city]["SUM"]["LINE"], dictSum["LINE"], keyMap)
+        AccumulateData(citySum[city]["SUM"]["AREA"], dictSum["AREA"], keyMap)
+
+        #子行政區
+        dc = {"POINT":{}, "LINE":{}, "AREA":{}, "SUM":{}}
+        for key in keyArr:
+            dc["POINT"][key] = GenSortedData(citySum[city]["POINT"], key, limitNum)
+            dc["LINE"][key] = GenSortedData(citySum[city]["LINE"], key, limitNum)
+            dc["AREA"][key] = GenSortedData(citySum[city]["AREA"], key, limitNum)
+        dc["SUM"] = citySum[city]["SUM"]
+        cityDict[no][city] = dc
+        
+    for no in cityDict:
+        with open('data/city_'+no+'.json', 'w') as outfile:
+            json.dump(cityDict[no], outfile)
 
     elapseTime = time.time() - startTime
     print("Data statistic finished in "+str(elapseTime)+" s")
