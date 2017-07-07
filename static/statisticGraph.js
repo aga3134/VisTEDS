@@ -18,11 +18,11 @@ function DrawPieChart(param){
 	}
 	var inRadius = 0;
 	if(param.title){
-		inRadius = 100;
+		inRadius = 60;
 		svg.append("text")
 			.attr("fill","#ffffff")
 			.attr("text-anchor","middle")
-			.attr("alignment-baseline", "baseline")
+			.attr("alignment-baseline", "middle")
 			.attr("x", 0)
 			.attr("y", 0)
 			.text(param.title);
@@ -68,7 +68,7 @@ function DrawPieChart(param){
 
 	update.select("path")
 		.on("mouseover", function(d,i) {
-			d3.select(this).style("stroke", "green");
+			d3.select(this).style("stroke", "yellow");
 			UpdateText(d,i);
 		})
 		.on("mouseout", function(d,i) {
@@ -140,7 +140,7 @@ function DrawBarChart(param){
 
 	rect.select("rect")
 		.on("mouseover", function(d,i) {
-			d3.select(this).style("stroke", "green");
+			d3.select(this).style("stroke", "yellow");
 			UpdateText(d,i);
 		})
 		.on("mouseout", function(d,i) {
