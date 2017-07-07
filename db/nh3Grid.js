@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-	return sequelize.define("nh3Grid", {
+	return sequelize.define("nh3grid", {
 	  	SERIAL_NO: {	//序號
 			type: DataTypes.INTEGER,
 			autoIncrement: true,

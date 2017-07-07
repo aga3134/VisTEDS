@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-	return sequelize.define("lineGroup", {
+	return sequelize.define("linegroup", {
 	  	SERIAL_NO: {	//序號
 			type: DataTypes.INTEGER,
 			autoIncrement: true,
