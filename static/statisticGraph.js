@@ -501,8 +501,8 @@ function DrawDictDetail(){
 			var key;
 			switch(g_DrawDictSource){
 				case "POINT": key = d.NAME; break;
-				case "LINE": key = g_CarType[d.ID]; break;
-				case "AREA": key = g_AreaType[d.ID]; break;
+				case "LINE": key = (d.ID in g_CarType)?g_CarType[d.ID]:d.ID; break;
+				case "AREA": key = (d.ID in g_AreaType)?g_AreaType[d.ID]:d.ID; break;
 			}
 			graphData.push({key: key, value: value});
 		}
