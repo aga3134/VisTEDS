@@ -1,6 +1,7 @@
 var g_TransTime = 500;
 var g_DrawCityType = "RANK";
 var g_DrawCityID = "";
+var g_DrawCitySource = "POINT";
 var g_DrawDictType = "ROUGH";
 var g_DrawDictID = "";
 var g_DrawDictSource = "POINT";
@@ -95,6 +96,7 @@ function DrawPieChart(param){
 //param: graphID, infoID, width, height, data, offsetX, offsetY, clickFn
 function DrawBarChart(param){
 	var rectH = (param.height-param.offsetY)/param.data.length;
+	var rectW = param.width-param.offsetX-10;
 
 	var color = d3.scale.category20();
 
@@ -151,7 +153,7 @@ function DrawBarChart(param){
        	.duration(g_TransTime)
        	.style("fill", function(d,i) { return color(i); })
 		.attr("stroke-width",2)
-		.attr("width", function(d){return param.width*d.value/maxValue;})
+		.attr("width", function(d){return rectW*d.value/maxValue;})
 		.attr("height", rectH)
 		.attr("fill",function(d,i){return color(i);})
 		.attr("x", function(d){return param.offsetX;})
@@ -215,12 +217,34 @@ function CheckCityMerge(no){
 	return id;
 }
 
+function GetCityMergeArr(no){
+	var arr = [no];
+	switch(no){
+		case "36": arr.push("17"); break;
+		case "17": arr.push("36"); break;
+		case "41": arr.push("21"); break;
+		case "21": arr.push("41"); break;
+		case "42": arr.push("02"); break;
+		case "02": arr.push("42"); break;
+	}
+	return arr;
+}
+
 function CityBackClick(){
 	var graph = $("#graphCity");
 	graph.html("");
-	g_DrawCityType = "RANK";
+	switch(g_DrawCityType){
+		case "RANK":
+			break;
+		case "RATIO":
+			g_DrawCityType = "RANK";
+			$("#backCity").css("display","none");
+			break;
+		case "DETAIL":
+			g_DrawCityType = "RATIO";
+			break;
+	}
 	DrawGraphCity(g_StatData.CITY);
-	$("#backCity").css("display","none");
 }
 
 function DrawCityRank(data){
@@ -295,9 +319,9 @@ function DrawCityRatio(data){
 		}
 	}
 
-	graphData.push({key: "點源", value: citySum["POINT"]});
-	graphData.push({key: "線源", value: citySum["LINE"]});
-	graphData.push({key: "面源", value: citySum["AREA"]});
+	graphData.push({key: "點源", value: citySum["POINT"], source: "POINT"});
+	graphData.push({key: "線源", value: citySum["LINE"], source: "LINE"});
+	graphData.push({key: "面源", value: citySum["AREA"], source: "AREA"});
 
 	//param: graphID, infoID, width, height, data
 	var param = {};
@@ -307,7 +331,79 @@ function DrawCityRatio(data){
 	param.height = height;
 	param.data = graphData;
 	param.title = cityName;
+	param.clickFn = function(d){
+		graph.html("");
+		g_DrawCityType = "DETAIL";
+		g_DrawCitySource = d.data.source;
+		$("#backCity").css("display","block");
+		DrawGraphCity(data);
+	}
 	DrawPieChart(param);
+}
+
+function DrawCityDetail(){
+	var no = g_DrawCityID.substr(0,2);
+	var cityArr = GetCityMergeArr(no);
+	var mergeData = {};
+
+	function DrawGraph(){
+		var graph = $("#graphCity");
+		var width = graph.width();
+		var height = graph.height();
+		var offsetX = 220;
+		var offsetY = 50;
+
+		var graphData = [];
+		for(var key in mergeData){
+			graphData.push({key: key, value: mergeData[key]});
+		}
+		graphData.sort(function(a,b){return b.value-a.value;});
+		graphData = graphData.slice(0,20);	//取前20名
+
+		//param: graphID, infoID, width, height, data, offsetX, offsetY
+		var param = {};
+		param.graphID = "graphCity";
+		param.infoID = "infoCity";
+		param.width = width;
+		param.height = height;
+		param.data = graphData;
+		param.offsetX = offsetX;
+		param.offsetY = offsetY;
+		DrawBarChart(param);
+	}
+
+	function MergeData(arr, i){
+		if(i >= arr.length) return DrawGraph();
+
+		var cityID = arr[i];
+		$.get("data/city_"+cityID+".json", function(data){
+			//console.log(data);
+
+			var pollute = $("#selPolluteDict").val();
+			
+			for(var key in data){
+				var source = data[key][g_DrawCitySource][pollute];
+				for(var j=0;j<source.length;j++){
+					var id;
+					switch(g_DrawCitySource){
+						case "POINT": id = source[j].NAME; break;
+						case "LINE": id = g_CarType[source[j].ID]; break;
+						case "AREA": id = g_AreaType[source[j].ID]; break;
+					}
+
+					if(id in mergeData){
+						mergeData[id] += source[j].SUM;
+					}
+					else{
+						mergeData[id] = source[j].SUM;
+					}
+				}
+			}
+			MergeData(arr, i+1);
+		});
+	}
+	MergeData(cityArr, 0);
+
 }
 
 function DrawGraphCity(data){
@@ -318,6 +414,9 @@ function DrawGraphCity(data){
 			break;
 		case "RATIO":
 			DrawCityRatio(data);
+			break;
+		case "DETAIL":
+			DrawCityDetail();
 			break;
 	}
 }
@@ -617,6 +716,7 @@ function DrawGraphTraffic(data){
 		var name = (key in g_CarType)?g_CarType[key]:key;
 		graphData.push({key: name, value: data[key][pollute]});
 	}
+	graphData.sort(function(a,b){return b.value-a.value;});
 
 	//param: graphID, infoID, width, height, data
 	var param = {};
