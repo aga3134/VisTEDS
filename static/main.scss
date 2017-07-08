@@ -163,6 +163,12 @@ html, body {
 		        background-color: rgb(150,150,150);
 		    }
     	}
+    	.clickable{
+			cursor: pointer;
+		}
+		.sorted{ 
+		    border: 1px solid yellow;
+		}
     	.center-p{
     		width: 600px;
     		max-width: 100%;

@@ -48,21 +48,46 @@ function LoadIDMap(){
 	});
 }
 
+function SortTable(item, index){
+	var tb = $(item).parents("table");
+	var isSwitch = true;
+	var rows = tb.find("tr");
+	var th = $(rows[0]).children("th");
+	th.removeClass("sorted");
+	while(isSwitch){
+		isSwitch = false;
+		for(var i=1;i<rows.length-1;i++){
+			var curRow = $(rows[i]);
+			var nextRow = $(rows[i+1]);
+			var curVal = parseFloat($(curRow.children("td")[index]).text());
+			var nextVal = parseFloat($(nextRow.children("td")[index]).text());
+			if(curVal < nextVal){
+				var html = curRow.html();
+				curRow.html(nextRow.html());
+				nextRow.html(html);
+				isSwitch = true;
+				break;
+			}
+		}
+	}
+	$(th[index]).addClass("sorted");
+}
+
 function GenPointTable(data){
 	var str = "<table>";
 	str += "<tr>";
 	str +="<th>公司名稱</th>";
 	str += "<th>汙染源編號</th>";
-	str += "<th>TSP<br>(公噸/年)</th>";
-	str += "<th>PM10<br>(公噸/年)</th>";
-	str += "<th>PM6<br>(公噸/年)</th>";
-	str += "<th>PM2.5<br>(公噸/年)</th>";
-	str += "<th>SOx<br>(公噸/年)</th>";
-	str += "<th>NOx<br>(公噸/年)</th>";
-	str += "<th>THC<br>(公噸/年)</th>";
-	str += "<th>NMHC<br>(公噸/年)</th>";
-	str += "<th>CO<br>(公噸/年)</th>";
-	str += "<th>PB<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,2);'>TSP<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,3);'>PM10<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,4);'>PM6<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,5);'>PM2.5<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,6);'>SOx<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,7);'>NOx<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,8);'>THC<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,9);'>NMHC<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,10);'>CO<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,11);'>PB<br>(公噸/年)</th>";
 	str += "<th>粒狀物控制效率<br>(%)</th>";
 	str += "<th>SOx控制效率<br>(%)</th>";
 	str += "<th>NOx控制效率<br>(%)</th>";
@@ -106,20 +131,20 @@ function GenLineTable(data){
 	str += "<tr>";
 	str +="<th>車種別</th>";
 	str += "<th>道路別</th>";
-	str += "<th>TSP<br>(公噸/年)</th>";
-	str += "<th>PM10<br>(公噸/年)</th>";
-	str += "<th>PM6<br>(公噸/年)</th>";
-	str += "<th>PM2.5<br>(公噸/年)</th>";
-	str += "<th>SOx<br>(公噸/年)</th>";
-	str += "<th>NOx<br>(公噸/年)</th>";
-	str += "<th>THC<br>(公噸/年)</th>";
-	str += "<th>NMHC<br>(公噸/年)</th>";
-	str += "<th>HC尾氣排放<br>(公噸/年)</th>";
-	str += "<th>HC蒸發損失<br>(公噸/年)</th>";
-	str += "<th>HC行駛損失<br>(公噸/年)</th>";
-	str += "<th>HC停等損失<br>(公噸/年)</th>";
-	str += "<th>CO<br>(公噸/年)</th>";
-	str += "<th>PB<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,2);'>TSP<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,3);'>PM10<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,4);'>PM6<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,5);'>PM2.5<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,6);'>SOx<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,7);'>NOx<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,8);'>THC<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,9);'>NMHC<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,10);'>HC尾氣排放<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,11);'>HC蒸發損失<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,12);'>HC行駛損失<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,13);'>HC停等損失<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,14);'>CO<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,15);'>PB<br>(公噸/年)</th>";
 	str += "</tr>";
 
 	var road = {};
@@ -161,16 +186,16 @@ function GenAreaTable(data){
 	var str = "<table>";
 	str += "<tr>";
 	str +="<th>面源種類</th>";
-	str += "<th>TSP<br>(公噸/年)</th>";
-	str += "<th>PM10<br>(公噸/年)</th>";
-	str += "<th>PM6<br>(公噸/年)</th>";
-	str += "<th>PM2.5<br>(公噸/年)</th>";
-	str += "<th>SOx<br>(公噸/年)</th>";
-	str += "<th>NOx<br>(公噸/年)</th>";
-	str += "<th>THC<br>(公噸/年)</th>";
-	str += "<th>NMHC<br>(公噸/年)</th>";
-	str += "<th>CO<br>(公噸/年)</th>";
-	str += "<th>PB<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,1);'>TSP<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,2);'>PM10<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,3);'>PM6<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,4);'>PM2.5<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,5);'>SOx<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,6);'>NOx<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,7);'>THC<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,8);'>NMHC<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,9);'>CO<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,10);'>PB<br>(公噸/年)</th>";
 	str += "</tr>";
 
 	for(var i=0;i<data.length;i++){
@@ -201,11 +226,11 @@ function GenAreaTable(data){
 function GenBioTable(data){
 	var str = "<table>";
 	str += "<tr>";
-	str += "<th>總非甲烷碳氫有機氣體<br>(公噸/年)</th>";
-	str += "<th>異戊二烯(Isoprene)<br>(公噸/年)</th>";
-	str += "<th>單帖類(Monoterpenes)<br>(公噸/年)</th>";
-	str += "<th>其他非甲烷碳氫有機氣體<br>(公噸/年)</th>";
-	str += "<th>甲基-丁烯-醇(Methyl-Buten-Ol)<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,0);'>總非甲烷碳氫有機氣體<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,1);'>異戊二烯(Isoprene)<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,2);'>單帖類(Monoterpenes)<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,3);'>其他非甲烷碳氫有機氣體<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,4);'>甲基-丁烯-醇(Methyl-Buten-Ol)<br>(公噸/年)</th>";
 	str += "</tr>";
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
@@ -227,7 +252,7 @@ function GenNH3Table(data){
 	var str = "<table>";
 	str += "<tr>";
 	str += "<th>氨源種類</th>";
-	str += "<th>NH3<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,0);'>NH3<br>(公噸/年)</th>";
 	str += "</tr>";
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
@@ -245,16 +270,16 @@ function GenSumTable(data){
 	var str = "<table>";
 	str += "<tr>";
 	str += "<th>汙染源</th>";
-	str += "<th>TSP<br>(公噸/年)</th>";
-	str += "<th>PM10<br>(公噸/年)</th>";
-	str += "<th>PM6<br>(公噸/年)</th>";
-	str += "<th>PM2.5<br>(公噸/年)</th>";
-	str += "<th>SOx<br>(公噸/年)</th>";
-	str += "<th>NOx<br>(公噸/年)</th>";
-	str += "<th>THC<br>(公噸/年)</th>";
-	str += "<th>NMHC<br>(公噸/年)</th>";
-	str += "<th>CO<br>(公噸/年)</th>";
-	str += "<th>PB<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,1);'>TSP<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,2);'>PM10<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,3);'>PM6<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,4);'>PM2.5<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,5);'>SOx<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,6);'>NOx<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,7);'>THC<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,8);'>NMHC<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,9);'>CO<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,10);'>PB<br>(公噸/年)</th>";
 	str += "</tr>";
 	var type = {};
 	type.POINT = "點源";

@@ -124,6 +124,10 @@ html, body {
         background-color: #7d7d7d; }
       .detail-panel .detail-info table tr:nth-child(odd) {
         background-color: #969696; }
+    .detail-panel .detail-info .clickable {
+      cursor: pointer; }
+    .detail-panel .detail-info .sorted {
+      border: 1px solid yellow; }
     .detail-panel .detail-info .center-p {
       width: 600px;
       max-width: 100%;
