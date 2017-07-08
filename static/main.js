@@ -252,7 +252,7 @@ function GenNH3Table(data){
 	var str = "<table>";
 	str += "<tr>";
 	str += "<th>氨源種類</th>";
-	str += "<th class='clickable' onclick='SortTable(this,0);'>NH3<br>(公噸/年)</th>";
+	str += "<th class='clickable' onclick='SortTable(this,1);'>NH3<br>(公噸/年)</th>";
 	str += "</tr>";
 	for(var i=0;i<data.length;i++){
 		var d = data[i];
