@@ -581,6 +581,12 @@ window.addEventListener('load', function() {
 		DrawGraphArea(g_StatData.AREA);
 	});
 
+	$("#statisticPanel").scroll(function(){
+		var panel = $(this);
+		var top = parseInt(panel.scrollTop());
+		panel.children(".close-bt").css("top",10+top);
+	});
+
 	LoadIDMap();
 	UpdateSenseRange();
 	UpdatePolluteOption();
