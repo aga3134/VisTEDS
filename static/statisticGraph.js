@@ -384,18 +384,19 @@ function DrawCityDetail(){
 			for(var key in data){
 				var source = data[key][g_DrawCitySource][pollute];
 				for(var j=0;j<source.length;j++){
+					var d = source[j];
 					var id;
 					switch(g_DrawCitySource){
-						case "POINT": id = source[j].NAME; break;
-						case "LINE": id = g_CarType[source[j].ID]; break;
-						case "AREA": id = g_AreaType[source[j].ID]; break;
+						case "POINT": id = d.NAME; break;
+						case "LINE": id = g_CarType[d.ID]?g_CarType[d.ID]:d.ID; break;
+						case "AREA": id = g_AreaType[d.ID]?g_AreaType[d.ID]:d.ID; break;
 					}
 
 					if(id in mergeData){
-						mergeData[id] += source[j].SUM;
+						mergeData[id] += d.SUM;
 					}
 					else{
-						mergeData[id] = source[j].SUM;
+						mergeData[id] = d.SUM;
 					}
 				}
 			}
