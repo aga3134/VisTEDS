@@ -379,7 +379,7 @@ function DrawCityDetail(){
 		$.get("data/city_"+cityID+".json", function(data){
 			//console.log(data);
 
-			var pollute = $("#selPolluteDict").val();
+			var pollute = $("#selPolluteCity").val();
 			
 			for(var key in data){
 				var source = data[key][g_DrawCitySource][pollute];
