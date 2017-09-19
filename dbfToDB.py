@@ -1086,14 +1086,14 @@ connection = pymysql.connect(host='localhost',user=auth["username"],
                 password=auth["password"],db=auth["dbName"],
                 charset='utf8',cursorclass=pymysql.cursors.DictCursor)
 
-#InsertPointSource("data/point.dbf")
-#InsertLineSource("data/linegrid.dbf")
-#InsertAreaSource("data/areagrid.dbf")
-#InsertBioSource("data/biogrid.dbf")
-#InsertNH3Source("data/nh3grid.dbf")
-#SumAllSource('data/point.dbf', 'data/linegrid.dbf', 'data/areagrid.dbf')
+InsertPointSource("data/point.dbf")
+InsertLineSource("data/linegrid.dbf")
+InsertAreaSource("data/areagrid.dbf")
+InsertBioSource("data/biogrid.dbf")
+InsertNH3Source("data/nh3grid.dbf")
+SumAllSource('data/point.dbf', 'data/linegrid.dbf', 'data/areagrid.dbf')
 
-#CreateIndex()
+CreateIndex()
 DataStatistic('data/point.dbf', 'data/linegrid.dbf', 'data/areagrid.dbf')
 
 connection.close()

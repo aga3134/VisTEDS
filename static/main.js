@@ -50,10 +50,27 @@ function LoadIDMap(){
 
 function SortTable(item, index){
 	var tb = $(item).parents("table");
-	var isSwitch = true;
 	var rows = tb.find("tr");
 	var th = $(rows[0]).children("th");
 	th.removeClass("sorted");
+	
+	var rowData = []
+	for(var i=1;i<rows.length;i++){
+		var curRow = $(rows[i]);
+		var curVal = parseFloat($(curRow.children("td")[index]).text());
+		rowData.push({"val":curVal, "data":"<tr>"+curRow.html()+"</tr>"});
+		curRow.remove();
+	}
+	function CompareFunc(a,b){
+		return b.val - a.val;
+	}
+	rowData.sort(CompareFunc);
+	for(var i=0;i<rowData.length;i++){
+		var sortData = rowData[i].data;
+		tb.append($(sortData));
+	}
+
+	/*var isSwitch = true;
 	while(isSwitch){
 		isSwitch = false;
 		for(var i=1;i<rows.length-1;i++){
@@ -69,7 +86,7 @@ function SortTable(item, index){
 				break;
 			}
 		}
-	}
+	}*/
 	$(th[index]).addClass("sorted");
 }
 
