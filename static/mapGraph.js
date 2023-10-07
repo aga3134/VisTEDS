@@ -547,7 +547,7 @@ function InitMap() {
 	google.maps.event.addListener(g_Map, 'bounds_changed', function() {
 		//只在一開始map ready時做一次，之後的更新交給dragend和zoom_changed事件
 		UpdateMapGrid();
-		google.maps.event.clearListeners(g_Map, 'bounds_changed');
+		//google.maps.event.clearListeners(g_Map, 'bounds_changed');
     });
 
 	g_Map.addListener('dragend', function() {
